@@ -588,7 +588,14 @@ footer{
     <button class="nav-link" onclick="scrollTo('exam-info')">Exam Info</button>
     <button class="nav-link" onclick="scrollTo('about')">About</button>
   </div>
-  <button class="nav-cta" onclick="scrollTo('tools')">Start Studying →</button>
+  <div style="display:flex;align-items:center;gap:0.5rem;">
+    <a href="https://paypal.me/TahirAyyub" target="_blank" rel="noopener noreferrer"
+      style="font-size:0.8rem;font-weight:600;padding:0.38rem 0.9rem;border-radius:6px;background:#0070ba;color:white;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;transition:background 0.15s;"
+      onmouseover="this.style.background='#005ea6'" onmouseout="this.style.background='#0070ba'">
+      ☕ Donate
+    </a>
+    <button class="nav-cta" onclick="scrollTo('tools')">Start Studying →</button>
+  </div>
 </nav>
 
 <!-- ══════════ HERO ══════════ -->
@@ -977,6 +984,34 @@ footer{
   </div>
 </section>
 
+<!-- ══════════ DONATE ══════════ -->
+<section id="donate" style="background:var(--ink2);padding:4rem 2rem;">
+  <div class="section-inner" style="max-width:700px;text-align:center;">
+    <div class="fade-up" style="display:inline-flex;align-items:center;gap:0.5rem;font-family:'DM Mono',monospace;font-size:0.72rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);background:rgba(201,146,26,0.12);border:1px solid rgba(201,146,26,0.25);padding:0.3rem 0.8rem;border-radius:4px;margin-bottom:1.25rem;">
+      ☕ Support This Resource
+    </div>
+    <h2 class="fade-up" style="font-family:'Fraunces',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:600;color:#f8fafc;line-height:1.2;margin-bottom:1rem;letter-spacing:-0.02em;">
+      This site is free.<br><em style="color:var(--gold);font-style:italic;">Keep it that way.</em>
+    </h2>
+    <p class="fade-up" style="font-size:0.95rem;color:#94a3b8;line-height:1.75;margin-bottom:0.75rem;max-width:540px;margin-left:auto;margin-right:auto;">
+      250 original exam questions, revision notes, a strategy guide, and a downloadable study guide — all built from scratch and completely free to use.
+    </p>
+    <p class="fade-up" style="font-size:0.95rem;color:#94a3b8;line-height:1.75;margin-bottom:2rem;max-width:540px;margin-left:auto;margin-right:auto;">
+      If this helped you prepare, a small donation keeps the site running and helps more CISM candidates access quality study materials.
+    </p>
+    <a class="fade-up" href="https://paypal.me/TahirAyyub" target="_blank" rel="noopener noreferrer"
+      style="display:inline-flex;align-items:center;gap:0.75rem;background:#0070ba;color:white;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;padding:0.9rem 2.25rem;border-radius:8px;text-decoration:none;transition:all 0.2s;box-shadow:0 4px 20px rgba(0,112,186,0.35);"
+      onmouseover="this.style.background='#005ea6';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,112,186,0.45)'"
+      onmouseout="this.style.background='#0070ba';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,112,186,0.35)'">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M7.144 19.532l1.049-5.751c.11-.605.691-1.047 1.305-1.047h7.351c2.914 0 5.201-2.081 5.201-5.103C22.05 4.62 19.699 3 16.418 3H6.595C5.54 3 4.647 3.742 4.461 4.783L2.028 18.404c-.162.906.514 1.754 1.44 1.754h2.9c.497 0 .673-.226.776-.626z"/><path opacity=".5" d="M20.05 7.647C19.58 10.3 17.432 12 14.85 12H8.498l-.963 5.281c-.11.605.303 1.182.916 1.182h2.9c.497 0 .673-.226.776-.626L13.174 13h3.244c2.914 0 5.201-2.081 5.201-5.103 0-.085-.003-.17-.008-.25z"/></svg>
+      Donate via PayPal
+    </a>
+    <p class="fade-up" style="font-size:0.75rem;color:#475569;margin-top:1.25rem;">
+      Any amount is appreciated — even £3 makes a difference. Thank you. 🙏
+    </p>
+  </div>
+</section>
+
 <!-- ══════════ FOOTER ══════════ -->
 <footer>
   <div class="footer-inner">
@@ -986,6 +1021,7 @@ footer{
       <a href="#domains">Domains</a>
       <a href="#tools">Tools</a>
       <a href="#exam-info">Exam Info</a>
+      <a href="#donate" style="color:var(--gold);">☕ Donate</a>
     </div>
     <div class="footer-copy">For educational purposes. Not affiliated with ISACA.</div>
   </div>
