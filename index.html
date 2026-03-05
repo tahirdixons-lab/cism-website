@@ -696,11 +696,11 @@ footer{
 
       <div class="resource-card fade-up" style="--card-accent:#10b981;animation-delay:0.1s">
         <div class="resource-icon" style="background:#f0fdfa;font-size:1.4rem;">📝</div>
-        <div class="resource-title">Mock Exam Simulator</div>
-        <div class="resource-desc">50 scenario-based questions mirroring the real CISM exam format. Timed (80 minutes), domain-weighted, with full explanations after each answer, a question navigator, and a scored results report.</div>
+        <div class="resource-title">Mock Exam Simulator — 4 Papers</div>
+        <div class="resource-desc">250 scenario-based questions across 5 independent exam papers, all mirroring the real CISM exam format. Papers 1–4 cover core exam concepts; <strong>Paper 5 is advanced difficulty</strong> — targeting edge cases, multi-factor reasoning, and the hardest governance and forensic scenarios. Each paper is timed (80 minutes) with full explanations and a scored results report.</div>
         <div class="resource-meta">
-          <span class="resource-tag" style="background:#f0fdfa;color:#0d9488;">50 Questions</span>
-          <button class="resource-btn" style="color:#0d9488;border-color:#0d9488;" onclick="openTool('exam')">Start Exam →</button>
+          <span class="resource-tag" style="background:#f0fdfa;color:#0d9488;">250 Questions</span>
+          <button class="resource-btn" style="color:#0d9488;border-color:#0d9488;" onclick="openTool('exam1')">Start Paper 1 →</button>
         </div>
       </div>
 
@@ -866,19 +866,64 @@ footer{
   <div class="section-inner">
     <span class="section-label fade-up">Interactive Tools</span>
     <h2 class="section-title fade-up">Study tools, right here</h2>
-    <p class="section-desc fade-up">Use the revision notes and exam simulator directly on this page — no separate app needed.</p>
+    <p class="section-desc fade-up">Revision notes, strategy guide, and four full mock exams — all usable directly on this page.</p>
+
+    <!-- Exam progress tracker -->
+    <div class="fade-up" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:2rem;margin-top:2rem;">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:var(--blue);">Paper 1</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">50 Questions</div>
+        <button onclick="switchTab('exam1')" style="margin-top:0.6rem;font-size:0.78rem;font-weight:600;padding:0.35rem 0.9rem;background:var(--blue);color:white;border:none;border-radius:5px;cursor:pointer;width:100%;">Start →</button>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:#7c3aed;">Paper 2</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">50 Questions</div>
+        <button onclick="switchTab('exam2')" style="margin-top:0.6rem;font-size:0.78rem;font-weight:600;padding:0.35rem 0.9rem;background:#7c3aed;color:white;border:none;border-radius:5px;cursor:pointer;width:100%;">Start →</button>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:#0d9488;">Paper 3</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">50 Questions</div>
+        <button onclick="switchTab('exam3')" style="margin-top:0.6rem;font-size:0.78rem;font-weight:600;padding:0.35rem 0.9rem;background:#0d9488;color:white;border:none;border-radius:5px;cursor:pointer;width:100%;">Start →</button>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:#b45309;">Paper 4</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">50 Questions</div>
+        <button onclick="switchTab('exam4')" style="margin-top:0.6rem;font-size:0.78rem;font-weight:600;padding:0.35rem 0.9rem;background:#b45309;color:white;border:none;border-radius:5px;cursor:pointer;width:100%;">Start →</button>
+      </div>
+      <div style="background:#0f1117;border:1px solid #374151;border-radius:10px;padding:1rem;text-align:center;">
+        <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:#f87171;">Paper 5</div>
+        <div style="font-size:0.72rem;color:#9ca3af;margin-top:0.2rem;">50 Questions · Hard</div>
+        <button onclick="switchTab('exam5')" style="margin-top:0.6rem;font-size:0.78rem;font-weight:600;padding:0.35rem 0.9rem;background:#dc2626;color:white;border:none;border-radius:5px;cursor:pointer;width:100%;">Start →</button>
+      </div>
+    </div>
 
     <div class="tabs" id="toolTabs">
       <button class="tab-btn active" onclick="switchTab('revision')">📋 Revision Notes</button>
-      <button class="tab-btn" onclick="switchTab('exam')">📝 Mock Exam</button>
+      <button class="tab-btn" onclick="switchTab('exam1')">📝 Paper 1</button>
+      <button class="tab-btn" onclick="switchTab('exam2')">📝 Paper 2</button>
+      <button class="tab-btn" onclick="switchTab('exam3')">📝 Paper 3</button>
+      <button class="tab-btn" onclick="switchTab('exam4')">📝 Paper 4</button>
+      <button class="tab-btn" onclick="switchTab('exam5')">🔥 Paper 5 · Hard</button>
       <button class="tab-btn" onclick="switchTab('strategy')">⚡ Strategy Guide</button>
     </div>
 
     <div class="tab-panel active" id="tab-revision">
       <iframe class="tool-embed" src="revision.html" title="CISM Revision Notes"></iframe>
     </div>
-    <div class="tab-panel" id="tab-exam">
-      <iframe class="tool-embed" src="exam.html" title="CISM Mock Exam" style="height:800px;"></iframe>
+    <div class="tab-panel" id="tab-exam1">
+      <iframe class="tool-embed" src="exam.html" title="CISM Mock Exam Paper 1" style="height:800px;"></iframe>
+    </div>
+    <div class="tab-panel" id="tab-exam2">
+      <iframe class="tool-embed" src="exam2.html" title="CISM Mock Exam Paper 2" style="height:800px;"></iframe>
+    </div>
+    <div class="tab-panel" id="tab-exam3">
+      <iframe class="tool-embed" src="exam3.html" title="CISM Mock Exam Paper 3" style="height:800px;"></iframe>
+    </div>
+    <div class="tab-panel" id="tab-exam4">
+      <iframe class="tool-embed" src="exam4.html" title="CISM Mock Exam Paper 4" style="height:800px;"></iframe>
+    </div>
+    <div class="tab-panel" id="tab-exam5">
+      <iframe class="tool-embed" src="exam5.html" title="CISM Mock Exam Paper 5 — Hard" style="height:800px;"></iframe>
     </div>
     <div class="tab-panel" id="tab-strategy">
       <iframe class="tool-embed" src="strategy.html" title="Exam Strategy Guide"></iframe>
@@ -960,8 +1005,9 @@ function scrollTo(id) {
 
 // Tab switching
 function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', b.textContent.toLowerCase().includes(name.substring(0,4)));
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    const btnName = b.getAttribute('onclick').replace("switchTab('","").replace("')","");
+    b.classList.toggle('active', btnName === name);
   });
   document.querySelectorAll('.tab-panel').forEach(p => {
     p.classList.toggle('active', p.id === 'tab-' + name);
