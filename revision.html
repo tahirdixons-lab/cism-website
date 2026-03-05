@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISM Exam Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --heading: #f8fafc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; position: relative; z-index: 1; }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(124,58,237,0.05));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(0,212,255,0.04) 0%, transparent 60%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+  .badge {
+    display: inline-block;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(0,212,255,0.3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    background: rgba(0,212,255,0.05);
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  h1 span { color: var(--accent); }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+  /* Domain nav */
+  .domain-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+  .domain-btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .domain-btn:hover, .domain-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+  }
+
+  /* Domain cards */
+  .domain-section { display: none; }
+  .domain-section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .domain-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .domain-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  .domain-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--heading); }
+  .domain-weight { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+  /* Cards grid */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); background: var(--surface2); }
+
+  .card-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .card h3 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--heading); margin-bottom: 0.75rem; }
+  .card ul { list-style: none; }
+  .card ul li {
+    font-size: 0.8rem;
+    color: var(--text);
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding-left: 0.75rem;
+    position: relative;
+    line-height: 1.5;
+  }
+  .card ul li::before { content: '›'; position: absolute; left: 0; color: var(--muted); }
+  .card ul li:last-child { border-bottom: none; }
+
+  /* Key term chips */
+  .terms-section { margin-bottom: 2rem; }
+  .terms-section h3 { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+  .terms-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .term-chip {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .term-chip:hover { opacity: 0.8; transform: scale(1.03); }
+
+  /* Exam tips */
+  .tips-section {
+    background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.03));
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .tips-section h3 { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent4); margin-bottom: 0.75rem; }
+  .tip { font-size: 0.8rem; color: var(--text); padding: 0.3rem 0; padding-left: 1rem; position: relative; line-height: 1.5; }
+  .tip::before { content: '⚡'; position: absolute; left: 0; font-size: 0.7rem; }
+
+  /* Progress bar */
+  .progress-bar-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem; }
+  .progress-bar-wrap h3 { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+  .domain-weights { display: flex; flex-direction: column; gap: 0.6rem; }
+  .weight-row { display: flex; align-items: center; gap: 0.75rem; }
+  .weight-label { font-size: 0.75rem; color: var(--text); width: 200px; flex-shrink: 0; }
+  .weight-bar { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .weight-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .weight-pct { font-size: 0.7rem; color: var(--muted); width: 35px; text-align: right; flex-shrink: 0; }
+
+  /* Tooltip */
+  .tooltip {
+    display: none;
+    position: fixed;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    max-width: 280px;
+    font-size: 0.78rem;
+    color: var(--text);
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    line-height: 1.5;
+  }
+  .tooltip.visible { display: block; }
+  .tooltip strong { color: var(--accent); font-family: 'Syne', sans-serif; display: block; margin-bottom: 0.3rem; }
+
+  /* Flashcard mode */
+  .flashcard-section { margin-bottom: 2rem; }
+  .flashcard-section h3 { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+  .flashcard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    min-height: 140px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .flashcard:hover { border-color: rgba(0,212,255,0.3); }
+  .flashcard .q { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--heading); }
+  .flashcard .a { font-size: 0.85rem; color: var(--accent3); display: none; margin-top: 0.5rem; line-height: 1.6; }
+  .flashcard.flipped .q { color: var(--muted); font-size: 0.75rem; }
+  .flashcard.flipped .a { display: block; }
+  .flashcard-hint { font-size: 0.7rem; color: var(--muted); margin-top: 0.5rem; }
+  .flashcard-nav { display: flex; gap: 0.75rem; margin-top: 0.75rem; justify-content: center; }
+  .fc-btn {
+    font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 600;
+    padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer; transition: all 0.2s;
+  }
+  .fc-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .fc-count { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">Exam Prep · ISACA</div>
+    <h1>CISM <span>Revision</span> Guide</h1>
+    <p class="subtitle">Certified Information Security Manager · 4 Domains · 150 Questions · 4 Hours</p>
+  </header>
+
+  <!-- Domain weight overview -->
+  <div class="progress-bar-wrap">
+    <h3>📊 Exam Domain Weightings</h3>
+    <div class="domain-weights">
+      <div class="weight-row">
+        <span class="weight-label">Domain 1 · Information Security Governance</span>
+        <div class="weight-bar"><div class="weight-fill" style="width:17%; background: #00d4ff;"></div></div>
+        <span class="weight-pct">17%</span>
+      </div>
+      <div class="weight-row">
+        <span class="weight-label">Domain 2 · Information Risk Management</span>
+        <div class="weight-bar"><div class="weight-fill" style="width:20%; background: #7c3aed;"></div></div>
+        <span class="weight-pct">20%</span>
+      </div>
+      <div class="weight-row">
+        <span class="weight-label">Domain 3 · Information Security Program</span>
+        <div class="weight-bar"><div class="weight-fill" style="width:33%; background: #10b981;"></div></div>
+        <span class="weight-pct">33%</span>
+      </div>
+      <div class="weight-row">
+        <span class="weight-label">Domain 4 · Incident Management</span>
+        <div class="weight-bar"><div class="weight-fill" style="width:30%; background: #f59e0b;"></div></div>
+        <span class="weight-pct">30%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav tabs -->
+  <div class="domain-nav">
+    <button class="domain-btn active" onclick="showDomain('d1')">① Governance</button>
+    <button class="domain-btn" onclick="showDomain('d2')">② Risk Mgmt</button>
+    <button class="domain-btn" onclick="showDomain('d3')">③ Security Program</button>
+    <button class="domain-btn" onclick="showDomain('d4')">④ Incident Mgmt</button>
+    <button class="domain-btn" onclick="showDomain('flash')">⚡ Flashcards</button>
+  </div>
+
+  <!-- DOMAIN 1 -->
+  <div id="d1" class="domain-section active">
+    <div class="domain-header">
+      <div class="domain-icon" style="background:rgba(0,212,255,0.1)">🏛️</div>
+      <div>
+        <div class="domain-title">Information Security Governance</div>
+        <div class="domain-weight">17% of exam · Establish & maintain framework aligning security with business goals</div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-label" style="color:#00d4ff">Core Concept</div>
+        <h3>Governance Framework</h3>
+        <ul>
+          <li>Security strategy must align with business objectives</li>
+          <li>Board/executive accountability for information security</li>
+          <li>Policies, standards, procedures, guidelines hierarchy</li>
+          <li>Security governance ≠ security management (strategic vs operational)</li>
+          <li>CISO reports to: ideally CEO or Board, not CIO</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#00d4ff">Key Roles</div>
+        <h3>Responsibilities & Accountability</h3>
+        <ul>
+          <li>Information Owner: classifies data, approves access</li>
+          <li>Data Custodian: implements controls, day-to-day protection</li>
+          <li>CISM: advises, manages program, reports to senior mgmt</li>
+          <li>Board: ultimate accountability for governance</li>
+          <li>Risk Acceptance: always done by business management</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#00d4ff">Frameworks & Standards</div>
+        <h3>Key Frameworks to Know</h3>
+        <ul>
+          <li>COBIT: IT governance, control objectives</li>
+          <li>ISO 27001: ISMS requirements (certifiable)</li>
+          <li>ISO 27002: controls guidance/best practices</li>
+          <li>NIST CSF: Identify, Protect, Detect, Respond, Recover</li>
+          <li>ITIL: IT service management</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#00d4ff">Policy Hierarchy</div>
+        <h3>Policy → Standard → Procedure</h3>
+        <ul>
+          <li>Policy: high-level, management-approved, mandatory</li>
+          <li>Standard: specific requirements that support policy</li>
+          <li>Procedure: step-by-step instructions</li>
+          <li>Guideline: recommended, not mandatory</li>
+          <li>Baseline: minimum acceptable security level</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#00d4ff">Metrics & Reporting</div>
+        <h3>Measuring Governance Effectiveness</h3>
+        <ul>
+          <li>KRI: Key Risk Indicator (early warning signals)</li>
+          <li>KPI: Key Performance Indicator (measure outcomes)</li>
+          <li>KGI: Key Goal Indicator (measure objectives met)</li>
+          <li>Report to Board: business risk terms, not technical</li>
+          <li>Balanced Scorecard: aligns security with business strategy</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#00d4ff">Exam Traps</div>
+        <h3>Watch Out For</h3>
+        <ul>
+          <li>Risk acceptance is ALWAYS a business decision</li>
+          <li>Security strategy flows FROM business strategy</li>
+          <li>Governance is about oversight, not implementation</li>
+          <li>"First step" = usually understand current state / risk</li>
+          <li>CISM advises but doesn't own final risk decisions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="terms-section">
+      <h3>🔑 Key Terms (hover for definitions)</h3>
+      <div class="terms-grid">
+        <span class="term-chip" style="color:#00d4ff;border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)" data-def="Information Security Management System – systematic approach to managing sensitive information based on ISO 27001">ISMS</span>
+        <span class="term-chip" style="color:#00d4ff;border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)" data-def="Governance, Risk & Compliance – integrated approach to managing these three disciplines together">GRC</span>
+        <span class="term-chip" style="color:#00d4ff;border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)" data-def="Separation of Duties – no single person controls entire process; reduces fraud/error risk">SoD</span>
+        <span class="term-chip" style="color:#00d4ff;border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)" data-def="Due Care: taking reasonable steps to protect. Due Diligence: ongoing verification those steps work">Due Care/Diligence</span>
+        <span class="term-chip" style="color:#00d4ff;border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)" data-def="Fiduciary Duty – legal obligation to act in best interest of the organisation; applies to Board members and senior management">Fiduciary Duty</span>
+        <span class="term-chip" style="color:#00d4ff;border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.05)" data-def="Charter – formal document authorising the security function, defining its scope, authority and responsibilities">Security Charter</span>
+      </div>
+    </div>
+
+    <div class="tips-section">
+      <h3>⚡ Exam Tips – Domain 1</h3>
+      <div class="tip">Always link security decisions to business value and risk</div>
+      <div class="tip">The CISM role is strategic and advisory – avoid answers where CISM makes unilateral decisions</div>
+      <div class="tip">Policies are approved by senior management/board, not IT or security team</div>
+      <div class="tip">When in doubt between governance options, choose the one that best supports business objectives</div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 2 -->
+  <div id="d2" class="domain-section">
+    <div class="domain-header">
+      <div class="domain-icon" style="background:rgba(124,58,237,0.1)">⚠️</div>
+      <div>
+        <div class="domain-title">Information Risk Management</div>
+        <div class="domain-weight">20% of exam · Identify, assess, and respond to information risk</div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-label" style="color:#7c3aed">Risk Fundamentals</div>
+        <h3>Risk Formula & Concepts</h3>
+        <ul>
+          <li>Risk = Threat × Vulnerability × Asset Value</li>
+          <li>Threat: potential cause of unwanted incident</li>
+          <li>Vulnerability: weakness that can be exploited</li>
+          <li>Exposure: extent of loss when risk event occurs</li>
+          <li>Residual Risk = Inherent Risk − Controls applied</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#7c3aed">Risk Assessment</div>
+        <h3>Qualitative vs Quantitative</h3>
+        <ul>
+          <li>Qualitative: High/Med/Low ratings, subjective, faster</li>
+          <li>Quantitative: ALE = ARO × SLE (in dollar amounts)</li>
+          <li>SLE = Asset Value × Exposure Factor</li>
+          <li>ARO = Annual Rate of Occurrence</li>
+          <li>ALE = Annual Loss Expectancy (quantitative basis)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#7c3aed">Risk Response Options</div>
+        <h3>The 4 T's</h3>
+        <ul>
+          <li>Treat (Mitigate): implement controls to reduce risk</li>
+          <li>Transfer: insurance, contracts (shifts financial impact)</li>
+          <li>Tolerate (Accept): risk within appetite, no action</li>
+          <li>Terminate (Avoid): stop the activity causing the risk</li>
+          <li>Risk acceptance must be formally documented</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#7c3aed">Risk Appetite & Tolerance</div>
+        <h3>Key Distinctions</h3>
+        <ul>
+          <li>Risk Appetite: amount of risk an org WANTS to take</li>
+          <li>Risk Tolerance: acceptable variation around appetite</li>
+          <li>Risk Capacity: maximum risk the org CAN absorb</li>
+          <li>Risk Threshold: point at which action must be taken</li>
+          <li>Set by senior management / Board</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#7c3aed">Risk Register</div>
+        <h3>Documentation & Tracking</h3>
+        <ul>
+          <li>Records identified risks, their ratings, and responses</li>
+          <li>Owner assigned for each risk item</li>
+          <li>Reviewed regularly – living document</li>
+          <li>Includes inherent and residual risk ratings</li>
+          <li>Key tool for communicating risk to management</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#7c3aed">Third-Party Risk</div>
+        <h3>Vendor & Supply Chain Risk</h3>
+        <ul>
+          <li>Risk doesn't disappear when outsourced</li>
+          <li>Contracts must include security requirements</li>
+          <li>Right to audit clause is important</li>
+          <li>SOC 2 reports used to assess vendor controls</li>
+          <li>Ongoing monitoring – not just onboarding</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="terms-section">
+      <h3>🔑 Key Terms</h3>
+      <div class="terms-grid">
+        <span class="term-chip" style="color:#7c3aed;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)" data-def="Single Loss Expectancy: Asset Value × Exposure Factor. The expected monetary loss each time a risk occurs">SLE</span>
+        <span class="term-chip" style="color:#7c3aed;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)" data-def="Annual Loss Expectancy: SLE × ARO. Used to prioritise security investments in quantitative analysis">ALE</span>
+        <span class="term-chip" style="color:#7c3aed;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)" data-def="Annual Rate of Occurrence: estimated frequency of a threat event happening per year">ARO</span>
+        <span class="term-chip" style="color:#7c3aed;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)" data-def="Exposure Factor: percentage of asset value lost if a specific threat occurs (0–100%)">Exposure Factor</span>
+        <span class="term-chip" style="color:#7c3aed;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)" data-def="Inherent Risk: the risk level BEFORE any controls are applied">Inherent Risk</span>
+        <span class="term-chip" style="color:#7c3aed;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)" data-def="Residual Risk: risk remaining AFTER controls are implemented. Must be accepted by management">Residual Risk</span>
+        <span class="term-chip" style="color:#7c3aed;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)" data-def="Control Risk: risk that internal controls fail to detect or prevent a problem">Control Risk</span>
+      </div>
+    </div>
+
+    <div class="tips-section">
+      <h3>⚡ Exam Tips – Domain 2</h3>
+      <div class="tip">Risk acceptance decisions are ALWAYS made by business owners, not the security team</div>
+      <div class="tip">Memorise ALE = ARO × SLE and SLE = Asset Value × EF for calculation questions</div>
+      <div class="tip">Outsourcing transfers financial liability but NOT accountability or responsibility</div>
+      <div class="tip">Risk assessment should happen BEFORE selecting controls</div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 3 -->
+  <div id="d3" class="domain-section">
+    <div class="domain-header">
+      <div class="domain-icon" style="background:rgba(16,185,129,0.1)">🛡️</div>
+      <div>
+        <div class="domain-title">Information Security Program Development & Management</div>
+        <div class="domain-weight">33% of exam · LARGEST domain · Design, build, and manage security program</div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-label" style="color:#10b981">Program Development</div>
+        <h3>Building the Security Program</h3>
+        <ul>
+          <li>Start with current-state assessment (gap analysis)</li>
+          <li>Define target state based on risk and business goals</li>
+          <li>Roadmap: prioritised projects to close gaps</li>
+          <li>Security architecture aligns with enterprise architecture</li>
+          <li>Program must be sustainable and measurable</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#10b981">Controls Framework</div>
+        <h3>Control Categories</h3>
+        <ul>
+          <li>Preventive: stop incidents occurring (firewalls, MFA)</li>
+          <li>Detective: identify when incidents occur (SIEM, logs)</li>
+          <li>Corrective: restore after incident (backup, patching)</li>
+          <li>Deterrent: discourage attackers (warnings, policies)</li>
+          <li>Compensating: alternative when primary control fails</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#10b981">Data Classification</div>
+        <h3>Classification & Handling</h3>
+        <ul>
+          <li>Owner classifies, Custodian protects</li>
+          <li>Common: Public, Internal, Confidential, Restricted</li>
+          <li>Govt: Unclassified, Sensitive, Secret, Top Secret</li>
+          <li>Controls applied must match classification level</li>
+          <li>Data lifecycle: Create → Use → Archive → Destroy</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#10b981">Security Architecture</div>
+        <h3>Defence in Depth Layers</h3>
+        <ul>
+          <li>Perimeter → Network → Host → Application → Data</li>
+          <li>Zero Trust: never trust, always verify</li>
+          <li>Least privilege: minimum necessary access</li>
+          <li>Separation of duties: no single point of control</li>
+          <li>Need-to-know: access only to what's required</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#10b981">Security Awareness</div>
+        <h3>Training & Culture</h3>
+        <ul>
+          <li>Awareness: know threats exist (phishing simulations)</li>
+          <li>Training: how to perform specific tasks securely</li>
+          <li>Education: in-depth understanding (for security staff)</li>
+          <li>Tailored by role: executives, developers, general staff</li>
+          <li>Effectiveness measured, not just completion rates</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#10b981">Identity & Access Mgmt</div>
+        <h3>IAM Key Concepts</h3>
+        <ul>
+          <li>Provisioning and de-provisioning processes</li>
+          <li>Periodic access reviews / recertification</li>
+          <li>Privileged Access Management (PAM): admin accounts</li>
+          <li>SSO and federation for enterprise environments</li>
+          <li>Joiner-Mover-Leaver lifecycle management</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#10b981">Vulnerability Management</div>
+        <h3>Assessment & Remediation</h3>
+        <ul>
+          <li>Vulnerability scan: automated, identifies weaknesses</li>
+          <li>Penetration test: simulates attacker, confirms exploitability</li>
+          <li>Patch management: timely, risk-based prioritisation</li>
+          <li>CVSS scores used to prioritise (Critical/High/Med/Low)</li>
+          <li>Remediate → Mitigate → Accept (with documented approval)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#10b981">Third-Party Management</div>
+        <h3>Vendor Security Requirements</h3>
+        <ul>
+          <li>Security requirements in contracts / SLAs</li>
+          <li>Right-to-audit clauses in agreements</li>
+          <li>SOC 1 (financial controls) vs SOC 2 (security controls)</li>
+          <li>Type I: design at a point in time; Type II: effectiveness over period</li>
+          <li>Ongoing monitoring, not just initial assessment</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tips-section">
+      <h3>⚡ Exam Tips – Domain 3</h3>
+      <div class="tip">This is the biggest domain (33%) – invest proportional revision time here</div>
+      <div class="tip">Program must always align to business strategy and risk appetite, not just technical standards</div>
+      <div class="tip">A pen test is NOT the same as a vulnerability scan – pen test confirms exploitability</div>
+      <div class="tip">SOC 2 Type II is preferred over Type I because it covers a period of time (effectiveness), not just design</div>
+      <div class="tip">Awareness ≠ Training ≠ Education – know the difference and when each is appropriate</div>
+    </div>
+  </div>
+
+  <!-- DOMAIN 4 -->
+  <div id="d4" class="domain-section">
+    <div class="domain-header">
+      <div class="domain-icon" style="background:rgba(245,158,11,0.1)">🚨</div>
+      <div>
+        <div class="domain-title">Information Security Incident Management</div>
+        <div class="domain-weight">30% of exam · Plan, respond, and recover from incidents</div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-label" style="color:#f59e0b">Incident Lifecycle</div>
+        <h3>6-Phase Response Process</h3>
+        <ul>
+          <li>① Preparation: plans, tools, team, training</li>
+          <li>② Detection & Analysis: identify & confirm incident</li>
+          <li>③ Containment: stop the spread (short/long term)</li>
+          <li>④ Eradication: remove root cause</li>
+          <li>⑤ Recovery: restore to normal operations</li>
+          <li>⑥ Lessons Learned: post-incident review (PIR)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#f59e0b">Key Plans</div>
+        <h3>IRP vs BCP vs DRP</h3>
+        <ul>
+          <li>IRP: Incident Response Plan – how to respond to security events</li>
+          <li>BCP: Business Continuity Plan – keep business running</li>
+          <li>DRP: Disaster Recovery Plan – recover IT systems</li>
+          <li>BCP is broader; DRP is a subset of BCP</li>
+          <li>All must be tested regularly, not just documented</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#f59e0b">RTO, RPO, MTD</div>
+        <h3>Recovery Objectives</h3>
+        <ul>
+          <li>RTO: Recovery Time Objective – max downtime tolerated</li>
+          <li>RPO: Recovery Point Objective – max data loss tolerated</li>
+          <li>MTD/MTO: Maximum Tolerable Downtime/Outage</li>
+          <li>WRT: Work Recovery Time (restore data/app after failover)</li>
+          <li>RTO + WRT ≤ MTD (must satisfy this relationship)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#f59e0b">Evidence & Forensics</div>
+        <h3>Digital Forensics Principles</h3>
+        <ul>
+          <li>Chain of custody: document handling of all evidence</li>
+          <li>Order of volatility: collect RAM before disk before network</li>
+          <li>Do NOT alter original evidence – use forensic copies</li>
+          <li>Write blockers prevent modification of evidence drives</li>
+          <li>Legal hold: preserve evidence when litigation expected</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#f59e0b">BCP/DR Testing</div>
+        <h3>Test Types (Least → Most Disruptive)</h3>
+        <ul>
+          <li>Checklist / Desk Review: review plan accuracy</li>
+          <li>Tabletop Exercise: walkthrough discussion</li>
+          <li>Parallel Test: run DR site alongside production</li>
+          <li>Full Interruption: cut over to DR, full test (most disruptive)</li>
+          <li>Simulation: scenario-based without actual failover</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#f59e0b">Communication & Escalation</div>
+        <h3>During an Incident</h3>
+        <ul>
+          <li>Pre-defined escalation paths and contact lists</li>
+          <li>Internal: executive notification for major incidents</li>
+          <li>External: customers, regulators, law enforcement</li>
+          <li>Legal and PR involved for significant breaches</li>
+          <li>Breach notification timelines vary by regulation (e.g. GDPR: 72hrs)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#f59e0b">Recovery Sites</div>
+        <h3>Hot / Warm / Cold Sites</h3>
+        <ul>
+          <li>Hot: fully operational, real-time replication, fastest recovery</li>
+          <li>Warm: partially equipped, hours to activate</li>
+          <li>Cold: facility only, days/weeks to bring online</li>
+          <li>Cloud: increasingly used as elastic recovery option</li>
+          <li>Cost inversely related to recovery time</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:#f59e0b">Post-Incident Review</div>
+        <h3>Lessons Learned (PIR)</h3>
+        <ul>
+          <li>Conduct within 2 weeks while memory is fresh</li>
+          <li>Blameless culture – focus on process improvement</li>
+          <li>Document: timeline, what worked, what didn't</li>
+          <li>Update IRP, BCP, DRP based on findings</li>
+          <li>Share (appropriately) with broader security community</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="terms-section">
+      <h3>🔑 Key Terms</h3>
+      <div class="terms-grid">
+        <span class="term-chip" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.05)" data-def="Recovery Time Objective: the maximum acceptable downtime for a system or process before causing unacceptable business impact">RTO</span>
+        <span class="term-chip" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.05)" data-def="Recovery Point Objective: the maximum acceptable amount of data loss measured in time. E.g. RPO=4hrs means last backup must be ≤4hrs old">RPO</span>
+        <span class="term-chip" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.05)" data-def="Maximum Tolerable Downtime: the absolute limit of time a process can be down before causing irreversible business harm">MTD</span>
+        <span class="term-chip" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.05)" data-def="Business Impact Analysis: identifies critical business processes and the impact of their disruption. Foundation for BCP/DRP">BIA</span>
+        <span class="term-chip" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.05)" data-def="Computer Security Incident Response Team: dedicated team responsible for handling security incidents">CSIRT</span>
+        <span class="term-chip" style="color:#f59e0b;border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.05)" data-def="Chain of Custody: documented trail of who collected, handled, and transferred evidence – critical for legal proceedings">Chain of Custody</span>
+      </div>
+    </div>
+
+    <div class="tips-section">
+      <h3>⚡ Exam Tips – Domain 4</h3>
+      <div class="tip">BIA (Business Impact Analysis) comes BEFORE creating BCP/DRP – you must know the impact first</div>
+      <div class="tip">Containment happens BEFORE eradication – stop the spread, THEN remove the cause</div>
+      <div class="tip">Chain of custody must be maintained – even small breaks can invalidate evidence in court</div>
+      <div class="tip">Remember: RTO + WRT must be less than or equal to MTD</div>
+      <div class="tip">GDPR requires breach notification within 72 hours – a commonly tested regulatory timeline</div>
+    </div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div id="flash" class="domain-section">
+    <div class="domain-header">
+      <div class="domain-icon" style="background:rgba(239,68,68,0.1)">⚡</div>
+      <div>
+        <div class="domain-title">Quick Recall Flashcards</div>
+        <div class="domain-weight">Click the card to reveal the answer · Use arrow buttons to navigate</div>
+      </div>
+    </div>
+
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="q" id="fc-q">Loading...</div>
+      <div class="a" id="fc-a"></div>
+    </div>
+    <div class="flashcard-hint">Click card to flip</div>
+    <div class="flashcard-nav">
+      <button class="fc-btn" onclick="prevCard()">← Prev</button>
+      <button class="fc-btn" onclick="flipCard()">Flip</button>
+      <button class="fc-btn" onclick="nextCard()">Next →</button>
+    </div>
+    <div class="fc-count" id="fc-count"></div>
+  </div>
+
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const flashcards = [
+  { q: "What is the formula for ALE?", a: "ALE = ARO × SLE (Annual Loss Expectancy = Annual Rate of Occurrence × Single Loss Expectancy)" },
+  { q: "Who is responsible for formally accepting residual risk?", a: "Business management / data owners – never the security team or CISO alone" },
+  { q: "What is the difference between RTO and RPO?", a: "RTO = max acceptable downtime. RPO = max acceptable data loss (measured in time since last backup)" },
+  { q: "What must RTO + WRT be less than or equal to?", a: "MTD (Maximum Tolerable Downtime). RTO + WRT ≤ MTD" },
+  { q: "Name the 6 phases of incident response in order", a: "Preparation → Detection & Analysis → Containment → Eradication → Recovery → Lessons Learned" },
+  { q: "What is the difference between a vulnerability scan and a penetration test?", a: "Vulnerability scan: automated identification of weaknesses. Pen test: simulates real attacker to confirm exploitability" },
+  { q: "What does SOC 2 Type II assess vs Type I?", a: "Type I: design of controls at a point in time. Type II: operating effectiveness of controls over a period (preferred)" },
+  { q: "What is the order of volatility in digital forensics?", a: "RAM → Swap/Page files → Disk → Remote/network logs. Most volatile first" },
+  { q: "What is the key difference between BCP and DRP?", a: "BCP focuses on keeping business running during disruption. DRP focuses on recovering IT systems. DRP is a subset of BCP" },
+  { q: "What are the 4 risk response options?", a: "Treat (mitigate), Transfer (insure/outsource), Tolerate (accept), Terminate (avoid)" },
+  { q: "What does GDPR require for breach notification timing?", a: "Supervisory authority must be notified within 72 hours of becoming aware of the breach" },
+  { q: "Who classifies data and who protects it?", a: "Information Owner classifies data. Custodian (often IT) protects and maintains it" },
+  { q: "What is the purpose of a BIA?", a: "Business Impact Analysis identifies critical processes and quantifies the impact of disruption. It drives BCP/DRP priorities" },
+  { q: "What is residual risk?", a: "The risk remaining after controls have been implemented. It equals Inherent Risk minus the effect of controls" },
+  { q: "What recovery site type has real-time data replication and fastest recovery?", a: "Hot site – most expensive but lowest RTO. Fully operational and ready for immediate failover" },
+  { q: "What is the difference between risk appetite and risk tolerance?", a: "Appetite: how much risk the org WANTS to take. Tolerance: acceptable variation around appetite. Capacity is the maximum the org can absorb" },
+  { q: "What is a KRI vs a KPI?", a: "KRI (Key Risk Indicator): forward-looking early warning of risk. KPI (Key Performance Indicator): backward-looking measure of performance" },
+  { q: "What security principle ensures no one person controls a full process?", a: "Separation of Duties (SoD) – prevents fraud and error by requiring multiple people for sensitive actions" },
+  { q: "What is Zero Trust architecture?", a: "Never trust, always verify – no user or device is trusted by default, even inside the network perimeter" },
+  { q: "What is the CISM's primary role during an incident?", a: "Strategic and managerial – coordinate response, communicate to senior management, ensure the IRP is followed. Not hands-on technical response" },
+];
+
+let current = 0;
+let flipped = false;
+
+function renderCard() {
+  const card = flashcards[current];
+  document.getElementById('fc-q').textContent = card.q;
+  document.getElementById('fc-a').textContent = card.a;
+  document.getElementById('fc-count').textContent = `Card ${current + 1} of ${flashcards.length}`;
+  const el = document.getElementById('flashcard');
+  el.classList.remove('flipped');
+  flipped = false;
+}
+
+function flipCard() {
+  const el = document.getElementById('flashcard');
+  if (!flipped) { el.classList.add('flipped'); flipped = true; }
+  else { el.classList.remove('flipped'); flipped = false; }
+}
+
+function nextCard() { current = (current + 1) % flashcards.length; renderCard(); }
+function prevCard() { current = (current - 1 + flashcards.length) % flashcards.length; renderCard(); }
+
+renderCard();
+
+// Domain navigation
+function showDomain(id) {
+  document.querySelectorAll('.domain-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.domain-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Tooltips
+const tooltip = document.getElementById('tooltip');
+document.querySelectorAll('.term-chip').forEach(chip => {
+  chip.addEventListener('mousemove', e => {
+    tooltip.innerHTML = `<strong>${chip.textContent}</strong>${chip.dataset.def}`;
+    tooltip.classList.add('visible');
+    tooltip.style.left = (e.clientX + 12) + 'px';
+    tooltip.style.top = (e.clientY - 10) + 'px';
+  });
+  chip.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+});
+
+// Keyboard navigation for flashcards
+document.addEventListener('keydown', e => {
+  if (document.getElementById('flash').classList.contains('active')) {
+    if (e.key === 'ArrowRight') nextCard();
+    if (e.key === 'ArrowLeft') prevCard();
+    if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISM Exam Strategy Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f1117;--surface:#fff;--surface2:#f6f7fa;--border:#e4e6ed;--muted:#6b7280;--blue:#1d4ed8;--gold:#92400e;--goldbg:#fffbeb;--goldbr:#fde68a;--green:#14532d;--greenbg:#f0fdf4;--greenbr:#86efac;--red:#991b1b;--redbg:#fef2f2;--redbr:#fecaca;--navy:#1a3a6b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'IBM Plex Sans',sans-serif;background:#f6f7fa;color:var(--ink);padding:2rem 1.5rem;line-height:1.6;}
+.container{max-width:820px;margin:0 auto;}
+.page-title{font-size:1.8rem;font-weight:600;color:var(--navy);margin-bottom:0.3rem;}
+.page-sub{font-size:0.9rem;color:var(--muted);margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+h2{font-size:1.1rem;font-weight:600;color:var(--navy);margin:2rem 0 0.75rem;padding-bottom:0.4rem;border-bottom:2px solid var(--border);}
+p{font-size:0.88rem;color:#374151;line-height:1.7;margin-bottom:0.75rem;}
+.callout{border-radius:8px;padding:1rem 1.25rem;margin:1rem 0;border-left:4px solid;}
+.callout-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;}
+.callout ul{list-style:none;padding:0;}
+.callout ul li{font-size:0.82rem;padding:0.2rem 0 0.2rem 1rem;position:relative;line-height:1.6;}
+.callout ul li::before{content:'›';position:absolute;left:0;font-weight:700;}
+.gold{background:var(--goldbg);border-color:#f59e0b;}.gold .callout-label{color:var(--gold);}
+.green{background:var(--greenbg);border-color:#22c55e;}.green .callout-label{color:var(--green);}
+.red{background:var(--redbg);border-color:#ef4444;}.red .callout-label{color:var(--red);}
+.blue{background:#eff6ff;border-color:var(--blue);}.blue .callout-label{color:var(--blue);}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.82rem;}
+th{background:var(--navy);color:white;padding:0.6rem 0.75rem;text-align:left;font-size:0.75rem;font-weight:600;}
+td{padding:0.55rem 0.75rem;border-bottom:1px solid var(--border);}
+tr:nth-child(even) td{background:#f8fafc;}
+.formula{background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:0.75rem 1rem;font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:#1e40af;text-align:center;margin:0.75rem 0;font-weight:500;}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page-title">⚡ CISM Exam Strategy Guide</div>
+<div class="page-sub">The patterns, rules and distinctions that separate passing from failing candidates</div>
+
+<h2>The "FIRST" Question Pattern</h2>
+<p>Many CISM questions ask what you should do <strong>first</strong>. There is almost always a pattern. Memorise these.</p>
+<table>
+<tr><th>Context</th><th>The "First" Answer</th></tr>
+<tr><td>Building a security programme</td><td>Current-state assessment / gap analysis</td></tr>
+<tr><td>Developing a security strategy</td><td>Understand the business strategy first</td></tr>
+<tr><td>Responding to an active incident</td><td>Contain — stop the spread</td></tr>
+<tr><td>A major vulnerability is found</td><td>Assess the risk and business impact</td></tr>
+<tr><td>Setting up incident response capability</td><td>Develop and document the IRP</td></tr>
+<tr><td>Starting a risk assessment</td><td>Identify and value assets</td></tr>
+<tr><td>Deploying a new system</td><td>Conduct a security architecture review</td></tr>
+<tr><td>Establishing BCP/DRP</td><td>Conduct a Business Impact Analysis (BIA)</td></tr>
+</table>
+
+<h2>The Risk Decision Authority Rule</h2>
+<div class="callout blue">
+<div class="callout-label">Who decides what</div>
+<ul>
+<li><strong>Board / Senior Management:</strong> approve risk appetite, accept high residual risks, approve security policy</li>
+<li><strong>Business / Data Owner:</strong> accept residual risk for their specific assets and processes</li>
+<li><strong>CISM / CISO:</strong> recommend treatment, develop policy, manage programme — NOT final decision-maker</li>
+<li><strong>IT / Security Team:</strong> implement controls as directed — NOT risk acceptance authority</li>
+</ul>
+</div>
+<div class="callout green">
+<div class="callout-label">Golden Rule</div>
+<ul><li>Risk acceptance is <strong>always</strong> a business decision. If an answer has the CISM or security team accepting risk, it is almost certainly wrong.</li></ul>
+</div>
+
+<h2>Essential Formulas</h2>
+<div class="formula">SLE = Asset Value × Exposure Factor (EF)</div>
+<div class="formula">ALE = SLE × ARO</div>
+<div class="formula">RTO + WRT ≤ MTD</div>
+<div class="formula">Control is justified if: Annual Control Cost &lt; ALE(before) − ALE(after)</div>
+
+<h2>Commonly Confused Term Pairs</h2>
+<table>
+<tr><th>Term A</th><th>Term B</th></tr>
+<tr><td>Policy: what MUST be done (mandatory)</td><td>Guideline: what is RECOMMENDED (optional)</td></tr>
+<tr><td>Standard: specific mandatory requirements</td><td>Baseline: minimum acceptable security level</td></tr>
+<tr><td>Due Care: taking reasonable protective steps</td><td>Due Diligence: verifying those steps work</td></tr>
+<tr><td>Governance: sets direction (Board)</td><td>Management: implements programme (CISO)</td></tr>
+<tr><td>Threat: the action or event (e.g. ransomware)</td><td>Threat Actor: the entity carrying it out</td></tr>
+<tr><td>Vulnerability: a weakness</td><td>Risk: likelihood × impact of exploitation</td></tr>
+<tr><td>KPI: how well activities are performed</td><td>KGI: whether goals have been achieved</td></tr>
+<tr><td>KRI: early warning of increasing risk</td><td>KPI: backward-looking performance measure</td></tr>
+<tr><td>SOC 2 Type I: control design at a point in time</td><td>SOC 2 Type II: effectiveness over a period</td></tr>
+<tr><td>Inherent Risk: before controls</td><td>Residual Risk: after controls (what gets accepted)</td></tr>
+<tr><td>Awareness: knowing threats exist</td><td>Training: knowing how to respond to them</td></tr>
+<tr><td>Vulnerability Scan: identifies weaknesses</td><td>Pen Test: confirms actual exploitability</td></tr>
+<tr><td>BCP: keep the business running (broader)</td><td>DRP: recover IT systems (subset of BCP)</td></tr>
+<tr><td>Risk Transfer: shifts financial liability</td><td>Risk Avoidance: eliminates the activity entirely</td></tr>
+</table>
+
+<h2>Incident Response — Order Is Everything</h2>
+<div class="callout red">
+<div class="callout-label">Most Common Exam Error</div>
+<ul><li>Jumping from Detection straight to Eradication — skipping Containment. <strong>Always contain before eradicating.</strong></li></ul>
+</div>
+<table>
+<tr><th>#</th><th>Phase</th><th>Key Point</th></tr>
+<tr><td>1</td><td>Preparation</td><td>IRP must exist before any incident occurs</td></tr>
+<tr><td>2</td><td>Detection &amp; Analysis</td><td>Confirm the incident is real; classify severity</td></tr>
+<tr><td>3</td><td>Containment</td><td><strong>STOP THE SPREAD first</strong> — isolate affected systems</td></tr>
+<tr><td>4</td><td>Eradication</td><td>Remove malware/root cause after containing</td></tr>
+<tr><td>5</td><td>Recovery</td><td>Restore and verify; monitor closely</td></tr>
+<tr><td>6</td><td>Lessons Learned</td><td>Blameless; update IRP; within 2 weeks</td></tr>
+</table>
+
+<h2>DR Testing — Disruption Order</h2>
+<table>
+<tr><th>Test Type</th><th>Disruption</th><th>Best For</th></tr>
+<tr><td>Checklist / Desk Review</td><td>None</td><td>Plan accuracy check</td></tr>
+<tr><td>Tabletop Exercise</td><td>Very low</td><td>Decision-making, training</td></tr>
+<tr><td>Simulation</td><td>Low</td><td>Scenario practice, comms test</td></tr>
+<tr><td>Parallel Test</td><td>Low–Medium</td><td>Validate DR site alongside production</td></tr>
+<tr><td>Full Interruption</td><td><strong>HIGH</strong></td><td>Maximum assurance — highest risk</td></tr>
+</table>
+
+<h2>Five Rules to Apply to Every Question</h2>
+<div class="callout gold">
+<div class="callout-label">Pre-answer checklist</div>
+<ul>
+<li>Is this governance (Board) or management (CISO)? Don't mix them up.</li>
+<li>Is there a "current state assessment" or "align to business" option? It's probably correct.</li>
+<li>Does the question involve risk acceptance? Answer = business owner, not security team.</li>
+<li>Is outsourcing involved? Transfers liability, not accountability.</li>
+<li>Is there a more business-aligned answer and a more technical answer? Business wins.</li>
+</ul>
+</div>
+</div>
+</body>
+</html>

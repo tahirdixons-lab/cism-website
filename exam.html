@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISM Exam Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --border: #d8d5cc;
+  --border-strong: #b5b0a5;
+  --text: #1a1916;
+  --muted: #6b6760;
+  --accent: #1a4fa0;
+  --accent-light: #e8eef8;
+  --correct: #166534;
+  --correct-bg: #f0fdf4;
+  --correct-border: #86efac;
+  --wrong: #991b1b;
+  --wrong-bg: #fef2f2;
+  --wrong-border: #fca5a5;
+  --warn: #92400e;
+  --warn-bg: #fffbeb;
+  --timer-ok: #166534;
+  --timer-warn: #b45309;
+  --timer-crit: #991b1b;
+  --selected-bg: #e8eef8;
+  --selected-border: #1a4fa0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ─── EXAM HEADER ─── */
+.exam-header {
+  background: var(--accent);
+  color: white;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.header-brand { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
+.header-title { font-size: 1rem; font-weight: 500; }
+.header-timer {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 500;
+  background: rgba(255,255,255,0.15);
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+}
+.timer-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.7; margin-right: 0.25rem; }
+.header-timer.warn { background: rgba(251,191,36,0.25); }
+.header-timer.critical { background: rgba(239,68,68,0.3); animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.6; } }
+
+.header-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 2rem;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+.progress-pill {
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+  height: 6px;
+  width: 200px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 20px;
+  transition: width 0.4s ease;
+}
+
+/* ─── MAIN LAYOUT ─── */
+.exam-body {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ─── QUESTION PANEL ─── */
+.question-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.question-meta {
+  background: #f9f8f6;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.q-number { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.q-domain {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+.domain-1 { background: #dbeafe; color: #1e40af; }
+.domain-2 { background: #ede9fe; color: #5b21b6; }
+.domain-3 { background: #d1fae5; color: #065f46; }
+.domain-4 { background: #fef3c7; color: #92400e; }
+
+.question-content { padding: 2rem 1.5rem 1.5rem; }
+
+.scenario-box {
+  background: #f9f8f6;
+  border-left: 3px solid var(--border-strong);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.scenario-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--border-strong); margin-bottom: 0.4rem; }
+
+.question-text {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text);
+  margin-bottom: 1.75rem;
+  font-weight: 400;
+}
+
+/* ─── OPTIONS ─── */
+.options { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.5rem; }
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: white;
+}
+.option:hover:not(.answered) { border-color: var(--accent); background: var(--accent-light); }
+.option.selected { border-color: var(--selected-border); background: var(--selected-bg); }
+.option.correct { border-color: var(--correct-border); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong-border); background: var(--wrong-bg); }
+.option.reveal-correct { border-color: var(--correct-border); background: var(--correct-bg); }
+
+.option-letter {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.15s;
+}
+.option.selected .option-letter { background: var(--accent); border-color: var(--accent); color: white; }
+.option.correct .option-letter { background: var(--correct); border-color: var(--correct); color: white; }
+.option.wrong .option-letter { background: var(--wrong); border-color: var(--wrong); color: white; }
+.option.reveal-correct .option-letter { background: var(--correct); border-color: var(--correct); color: white; }
+
+.option-text { font-size: 0.88rem; line-height: 1.6; color: var(--text); padding-top: 0.05rem; }
+
+/* ─── EXPLANATION ─── */
+.explanation {
+  display: none;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+.explanation.wrong-exp { background: #fef9f0; border-color: #fcd34d; }
+.explanation-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; color: var(--correct); }
+.explanation.wrong-exp .explanation-label { color: var(--warn); }
+.explanation-text { font-size: 0.82rem; line-height: 1.65; color: var(--text); }
+.explanation.show { display: block; }
+
+/* ─── QUESTION FOOTER ─── */
+.question-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f8f6;
+}
+.flag-btn {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.78rem; font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: white;
+  transition: all 0.15s;
+}
+.flag-btn:hover { border-color: var(--warn); color: var(--warn); }
+.flag-btn.flagged { border-color: var(--warn); color: var(--warn); background: var(--warn-bg); }
+
+.nav-btns { display: flex; gap: 0.5rem; }
+.btn {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.5rem 1.1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1.5px solid;
+}
+.btn-secondary { background: white; border-color: var(--border); color: var(--text); }
+.btn-secondary:hover { border-color: var(--border-strong); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
+.btn-primary:hover { background: #153d80; }
+.btn-submit { background: #166534; border-color: #166534; color: white; }
+.btn-submit:hover { background: #14532d; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── SIDEBAR ─── */
+.sidebar { display: flex; flex-direction: column; gap: 1rem; }
+
+.sidebar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.sidebar-header {
+  background: #f9f8f6;
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+/* Question grid navigator */
+.q-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  padding: 0.75rem;
+}
+.q-dot {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem;
+  font-family: 'IBM Plex Mono', monospace;
+  cursor: pointer;
+  transition: all 0.1s;
+  background: white;
+  color: var(--muted);
+}
+.q-dot:hover { border-color: var(--accent); }
+.q-dot.current { border-color: var(--accent); background: var(--accent); color: white; }
+.q-dot.answered { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+.q-dot.flagged-dot { background: var(--warn-bg); border-color: #fbbf24; color: var(--warn); }
+.q-dot.flagged-dot.answered { background: #fef9c3; }
+
+.grid-legend { padding: 0 0.75rem 0.75rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.legend-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.65rem; color: var(--muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; border: 1px solid; }
+
+/* Stats sidebar */
+.stat-rows { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.stat-row { display: flex; justify-content: space-between; font-size: 0.78rem; }
+.stat-label { color: var(--muted); }
+.stat-val { font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+
+/* ─── SCREENS ─── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* START SCREEN */
+#startScreen {
+  min-height: 100vh;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+#startScreen.active { display: flex; }
+
+.start-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 3rem;
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+.isaca-logo {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+.start-title { font-size: 2rem; font-weight: 300; color: var(--text); margin-bottom: 0.25rem; }
+.start-sub { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; }
+.start-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+.info-cell {
+  background: #f9f8f6;
+  padding: 0.75rem 1rem;
+}
+.info-cell-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.2rem; }
+.info-cell-val { font-size: 0.9rem; font-weight: 500; }
+.start-rules { text-align: left; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 1rem; margin-bottom: 2rem; font-size: 0.8rem; line-height: 1.7; color: #78350f; }
+.start-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.9rem 3rem;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: 'IBM Plex Sans', sans-serif;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s;
+}
+.start-btn:hover { background: #153d80; }
+
+/* RESULTS SCREEN */
+#resultsScreen { display: none; min-height: 100vh; padding: 2rem; }
+#resultsScreen.active { display: block; }
+.results-container { max-width: 900px; margin: 0 auto; }
+.results-header { text-align: center; margin-bottom: 2rem; }
+.results-title { font-size: 2rem; font-weight: 300; margin-bottom: 0.5rem; }
+.score-circle {
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  border: 6px solid;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin: 1.5rem auto;
+}
+.score-pct { font-size: 2.2rem; font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+.score-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.7; }
+
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+.result-card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; }
+.result-card h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.75rem; }
+
+.domain-result-bar { margin-bottom: 0.6rem; }
+.drb-header { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.3rem; }
+.drb-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.drb-fill { height: 100%; border-radius: 3px; }
+
+.review-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.review-item {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.review-item:hover { border-color: var(--accent); }
+.review-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.review-item-q { font-size: 0.82rem; line-height: 1.5; color: var(--text); }
+.review-badge {
+  font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.5rem;
+  border-radius: 3px; letter-spacing: 0.05em; text-transform: uppercase; flex-shrink: 0; margin-left: 0.5rem;
+}
+.badge-correct { background: #dcfce7; color: var(--correct); }
+.badge-wrong { background: #fee2e2; color: var(--wrong); }
+
+.restart-btn {
+  background: var(--accent); color: white; border: none;
+  padding: 0.8rem 2rem; font-size: 0.9rem; font-weight: 500;
+  font-family: 'IBM Plex Sans', sans-serif;
+  border-radius: 6px; cursor: pointer; margin-top: 1.5rem;
+  transition: background 0.15s; display: block; margin: 1.5rem auto 0;
+}
+.restart-btn:hover { background: #153d80; }
+
+/* ─── EXAM WRAPPER ─── */
+#examWrapper { display: none; }
+#examWrapper.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="active">
+  <div class="start-card">
+    <div class="isaca-logo">ISACA · Official Certification</div>
+    <div class="start-title">CISM Examination</div>
+    <div class="start-sub">Certified Information Security Manager</div>
+    <div class="start-info">
+      <div class="info-cell"><div class="info-cell-label">Questions</div><div class="info-cell-val">150 Questions</div></div>
+      <div class="info-cell"><div class="info-cell-label">Duration</div><div class="info-cell-val">4 Hours (240 min)</div></div>
+      <div class="info-cell"><div class="info-cell-label">Passing Score</div><div class="info-cell-val">450 / 800</div></div>
+      <div class="info-cell"><div class="info-cell-label">Format</div><div class="info-cell-val">Multiple Choice (A–D)</div></div>
+      <div class="info-cell"><div class="info-cell-label">Domain 1</div><div class="info-cell-val">Governance — 17%</div></div>
+      <div class="info-cell"><div class="info-cell-label">Domain 2</div><div class="info-cell-val">Risk Mgmt — 20%</div></div>
+      <div class="info-cell"><div class="info-cell-label">Domain 3</div><div class="info-cell-val">Security Program — 33%</div></div>
+      <div class="info-cell"><div class="info-cell-label">Domain 4</div><div class="info-cell-val">Incident Mgmt — 30%</div></div>
+    </div>
+    <div class="start-rules">
+      <strong>Instructions:</strong> This simulation uses 50 exam-representative questions proportionally weighted across all 4 domains. Select one answer per question. You may flag questions for review. The timer runs continuously — manage your time carefully. Explanations are shown after each answer.
+    </div>
+    <button class="start-btn" onclick="startExam()">Begin Examination</button>
+  </div>
+</div>
+
+<!-- EXAM WRAPPER -->
+<div id="examWrapper">
+  <div class="exam-header">
+    <div class="header-top">
+      <span class="header-brand">ISACA · CISM</span>
+      <span class="header-title">Certified Information Security Manager Examination</span>
+      <div class="header-timer" id="timerDisplay">
+        <span class="timer-label">Time Remaining</span>
+        <span id="timerText">1:20:00</span>
+      </div>
+    </div>
+    <div class="header-bottom">
+      <span id="headerProgress">Question 1 of 50</span>
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <div class="progress-pill"><div class="progress-fill" id="progressFill" style="width:2%"></div></div>
+        <span id="answeredCount">0 answered</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="exam-body">
+    <!-- Question Panel -->
+    <div class="question-panel">
+      <div class="question-meta">
+        <span class="q-number" id="qNumber">Question 1 of 50</span>
+        <span class="q-domain" id="qDomain">Domain 1</span>
+      </div>
+      <div class="question-content">
+        <div class="scenario-box" id="scenarioBox" style="display:none">
+          <div class="scenario-label">Scenario</div>
+          <div id="scenarioText"></div>
+        </div>
+        <div class="question-text" id="questionText"></div>
+        <div class="options" id="optionsContainer"></div>
+        <div class="explanation" id="explanation">
+          <div class="explanation-label" id="expLabel">Correct Answer</div>
+          <div class="explanation-text" id="expText"></div>
+        </div>
+      </div>
+      <div class="question-footer">
+        <button class="flag-btn" id="flagBtn" onclick="toggleFlag()">⚑ Flag for Review</button>
+        <div class="nav-btns">
+          <button class="btn btn-secondary" id="prevBtn" onclick="navigate(-1)">← Previous</button>
+          <button class="btn btn-primary" id="nextBtn" onclick="navigate(1)">Next →</button>
+          <button class="btn btn-submit" id="submitBtn" onclick="submitExam()" style="display:none">Submit Exam</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-header">Question Navigator</div>
+        <div class="q-grid" id="qGrid"></div>
+        <div class="grid-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#dbeafe;border-color:#93c5fd"></div>Answered</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#fef9c3;border-color:#fbbf24"></div>Flagged</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent);border-color:var(--accent)"></div>Current</div>
+        </div>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-header">Session Stats</div>
+        <div class="stat-rows">
+          <div class="stat-row"><span class="stat-label">Answered</span><span class="stat-val" id="statAnswered">0 / 50</span></div>
+          <div class="stat-row"><span class="stat-label">Flagged</span><span class="stat-val" id="statFlagged">0</span></div>
+          <div class="stat-row"><span class="stat-label">Unanswered</span><span class="stat-val" id="statUnanswered">50</span></div>
+          <div class="stat-row"><span class="stat-label">Correct (so far)</span><span class="stat-val" id="statCorrect">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="resultsScreen">
+  <div class="results-container">
+    <div class="results-header">
+      <div class="isaca-logo" style="text-align:center;margin-bottom:0.5rem">ISACA · CISM</div>
+      <div class="results-title">Examination Complete</div>
+      <div id="passFailBadge" style="font-size:1rem;font-weight:600"></div>
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-pct" id="scorePct">—</div>
+        <div class="score-label">Score</div>
+      </div>
+      <div style="color:var(--muted);font-size:0.85rem" id="scoreDetail"></div>
+    </div>
+    <div class="results-grid">
+      <div class="result-card">
+        <h3>Domain Performance</h3>
+        <div id="domainResults"></div>
+      </div>
+      <div class="result-card">
+        <h3>Summary Statistics</h3>
+        <div id="summaryStats" class="stat-rows"></div>
+      </div>
+    </div>
+    <div class="result-card" style="margin-bottom:1rem">
+      <h3 style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.75rem">Question Review</h3>
+      <div class="review-list" id="reviewList"></div>
+    </div>
+    <button class="restart-btn" onclick="restartExam()">Retake Examination</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// QUESTION BANK — 50 CISM-style questions, domain-weighted
+// Domain 1: ~8-9q (17%), Domain 2: ~10q (20%), Domain 3: ~16-17q (33%), Domain 4: ~15q (30%)
+// ═══════════════════════════════════════════════════════════
+const questions = [
+// ─── DOMAIN 1: INFORMATION SECURITY GOVERNANCE (9 questions) ───
+{
+  domain:1,
+  text:"An organization's board of directors has asked the CISM to present the current state of the information security program. Which of the following metrics would be MOST appropriate to include in this presentation?",
+  options:["Number of open vulnerabilities identified by the last scan","Percentage of business objectives supported by security controls","Technical severity ratings of recent penetration test findings","Count of security incidents handled by the SOC last quarter"],
+  answer:1,
+  explanation:"Board-level reporting should translate security posture into business terms. Demonstrating how security supports business objectives is most meaningful to executives. Technical details such as vulnerability counts or penetration test severity ratings are operational metrics better suited to management-level reporting."
+},
+{
+  domain:1,
+  text:"A newly appointed CISM wants to establish an information security strategy. Which of the following should be completed FIRST?",
+  options:["Develop a security awareness training programme","Conduct a gap analysis against ISO 27001","Align the security strategy with business objectives and enterprise strategy","Implement a risk register and begin populating it with known risks"],
+  answer:2,
+  explanation:"Security strategy must be derived from and aligned to the overall business strategy before any other steps. Without understanding the business direction, any security framework, gap analysis, or risk register will lack strategic context. Business alignment is always the foundational first step."
+},
+{
+  domain:1,
+  scenario:"A financial services firm has recently undergone significant regulatory changes. The CISM has been asked to update the information security policy to reflect new compliance requirements.",
+  text:"Who should have FINAL approval authority for the updated information security policy?",
+  options:["The Chief Information Security Officer","The Chief Information Officer","Senior management or the board of directors","The legal and compliance team"],
+  answer:2,
+  explanation:"Information security policies must be approved by senior management or the board of directors. This establishes authority, accountability, and demonstrates executive commitment to the security programme. The CISO develops and recommends the policy but does not have final approval authority."
+},
+{
+  domain:1,
+  text:"An information security manager discovers that the organisation's security programme is not producing the intended results. Which of the following would be the BEST first course of action?",
+  options:["Increase the security budget to fund additional controls","Benchmark current performance against industry standards","Assess whether the programme is aligned with business objectives and risk appetite","Replace existing security tools with more effective alternatives"],
+  answer:2,
+  explanation:"Before taking corrective action, the CISM must understand whether the programme's underperformance is due to misalignment with business goals or risk appetite. Assessing this alignment reveals the root cause. Benchmarking or increasing budgets without understanding the underlying issue may not address the real problem."
+},
+{
+  domain:1,
+  text:"Which of the following BEST describes the difference between information security governance and information security management?",
+  options:["Governance focuses on technology controls; management focuses on policy development","Governance sets direction and accountability; management implements and operates the programme","Governance is performed by the security team; management is performed by the board","Governance is reactive; management is proactive"],
+  answer:1,
+  explanation:"Governance is a strategic function concerned with setting direction, accountability structures, and ensuring alignment with business objectives — the responsibility of senior leadership and the board. Management is the operational function of implementing, running, and maintaining the security programme."
+},
+{
+  domain:1,
+  text:"An organisation wants to measure whether its security programme is achieving its intended goals. Which of the following would be MOST useful for this purpose?",
+  options:["Key Risk Indicators (KRIs)","Key Performance Indicators (KPIs)","Key Goal Indicators (KGIs)","Balanced Scorecard metrics"],
+  answer:2,
+  explanation:"Key Goal Indicators (KGIs) measure whether specific goals or objectives have been achieved. KPIs measure how well activities are being performed (process efficiency), and KRIs provide early warning of increasing risk. KGIs are specifically designed to measure whether desired outcomes have been reached."
+},
+{
+  domain:1,
+  text:"A CISM is evaluating where the information security function should report within the organisational hierarchy. Which reporting structure BEST supports security governance?",
+  options:["Security reports to the Chief Information Officer to ensure technology alignment","Security reports directly to the Chief Executive Officer or Board","Security reports to the Chief Financial Officer for budget oversight","Security reports to the Chief Operating Officer for operational integration"],
+  answer:1,
+  explanation:"Reporting to the CEO or Board ensures the security function has executive visibility and independence from IT operations. Reporting to the CIO creates a conflict of interest as the CIO is responsible for IT delivery, which security must sometimes challenge. Independence and executive access are hallmarks of effective governance."
+},
+{
+  domain:1,
+  text:"Which of the following is the PRIMARY purpose of an information security charter?",
+  options:["To document all security incidents and their resolutions","To formally establish the authority, scope, and responsibilities of the security function","To provide technical specifications for security tools and platforms","To serve as the organisation's primary information security policy"],
+  answer:1,
+  explanation:"A security charter is the foundational document that formally authorises the existence of the security function, defines its scope of authority, and establishes its responsibilities and accountability relationships. It is distinct from policy and does not serve an operational or technical purpose."
+},
+{
+  domain:1,
+  text:"When implementing a security governance framework, which of the following provides the BEST foundation for ensuring accountability?",
+  options:["Deploying comprehensive security monitoring tools","Establishing clearly defined roles and responsibilities for all security-related activities","Conducting annual security audits and publishing the results","Implementing mandatory security awareness training for all staff"],
+  answer:1,
+  explanation:"Governance is fundamentally about accountability. Clearly defined roles and responsibilities ensure that individuals and teams understand what they are accountable for. Tools, audits, and training are important operational elements but do not in themselves create the governance structure needed for accountability."
+},
+
+// ─── DOMAIN 2: INFORMATION RISK MANAGEMENT (10 questions) ───
+{
+  domain:2,
+  text:"A risk assessment reveals that a critical business system has a Single Loss Expectancy (SLE) of £500,000 and an Annual Rate of Occurrence (ARO) of 0.4. What is the Annual Loss Expectancy (ALE), and what does this figure represent?",
+  options:["£200,000 — the maximum possible loss from a single incident","£200,000 — the expected annual monetary loss used to justify control costs","£1,250,000 — the total cost of recovery over three years","£500,000 — the loss expected each time the threat materialises"],
+  answer:1,
+  explanation:"ALE = SLE × ARO = £500,000 × 0.4 = £200,000. The ALE represents the expected monetary loss per year for a given risk. This figure is used in quantitative risk analysis to justify investment in controls — a control costing less than £200,000 annually would be cost-effective to implement."
+},
+{
+  domain:2,
+  text:"During a risk assessment, the CISM identifies a significant vulnerability in a critical system. After evaluating the available options, management decides not to implement any controls because the cost of controls exceeds the potential loss. This is an example of which risk response strategy?",
+  options:["Risk mitigation","Risk transfer","Risk avoidance","Risk acceptance"],
+  answer:3,
+  explanation:"When management makes a deliberate, documented decision to accept a risk because the cost of controls exceeds the potential loss, this is risk acceptance (tolerate). This is a valid strategy when the risk falls within the organisation's risk appetite. The decision must be formally documented and signed off by an authorised business owner."
+},
+{
+  domain:2,
+  scenario:"A global retailer is considering outsourcing its customer data processing to a third-party cloud provider. The legal team has confirmed the provider will assume contractual liability for data breaches affecting their platform.",
+  text:"Which risk concept is BEST illustrated by this arrangement?",
+  options:["Risk elimination, as the third party assumes full responsibility","Risk transfer, which shifts financial liability but not accountability","Risk acceptance, as the organisation accepts the inherent risk of outsourcing","Risk reduction, as the cloud provider's controls lower the overall risk"],
+  answer:1,
+  explanation:"Outsourcing and contractual arrangements represent risk transfer — the financial liability shifts to the third party. However, the organisation retains accountability and regulatory responsibility for the protection of its customer data. Risk cannot be fully transferred; the organisation remains ultimately accountable to regulators and customers."
+},
+{
+  domain:2,
+  text:"A CISM is building a risk register. Which of the following BEST describes the difference between inherent risk and residual risk?",
+  options:["Inherent risk is quantitative; residual risk is qualitative","Inherent risk exists before controls are applied; residual risk remains after controls are applied","Inherent risk is assessed by IT; residual risk is assessed by the business","Inherent risk applies to external threats; residual risk applies to internal threats"],
+  answer:1,
+  explanation:"Inherent risk is the raw, untreated level of risk that exists before any controls are in place. Residual risk is what remains after controls have been implemented. Both need to be documented in the risk register, and residual risk must be formally accepted by an appropriate business owner when it exceeds risk appetite."
+},
+{
+  domain:2,
+  text:"An organisation has determined that its web application faces a medium-severity vulnerability. The vulnerability requires a combination of a specific attack vector, an authenticated session, and a particular system configuration to be exploited. How does this information affect the risk rating?",
+  options:["The risk rating increases because multiple conditions must align","The risk rating decreases because the threat has limited exploitability","The rating remains unchanged as all medium vulnerabilities carry the same risk","The risk must be escalated immediately regardless of exploitability conditions"],
+  answer:1,
+  explanation:"Risk is a function of both likelihood and impact. When exploitation requires multiple specific conditions (attack vector, authentication, configuration), the likelihood of exploitation decreases significantly. A lower likelihood reduces the overall risk rating even if the underlying vulnerability is present, enabling more proportionate prioritisation of remediation."
+},
+{
+  domain:2,
+  text:"Which of the following BEST describes the PRIMARY purpose of a risk appetite statement?",
+  options:["To document the organisation's minimum acceptable security control standards","To define the amount and type of risk the organisation is willing to accept in pursuit of its objectives","To establish the process for escalating high-risk items to the board","To set the organisation's target risk rating for all information assets"],
+  answer:1,
+  explanation:"A risk appetite statement formally defines how much risk an organisation is willing to accept in pursuit of its business objectives. It guides decision-making at all levels, ensuring that risk responses are proportionate and aligned with what leadership considers acceptable. It is set by senior management and the board."
+},
+{
+  domain:2,
+  text:"A CISM is conducting a threat modelling exercise. Which of the following would be considered a threat ACTOR rather than a threat?",
+  options:["A ransomware attack against production systems","A nation-state sponsored hacking group","Social engineering of employees","Exploitation of an unpatched vulnerability"],
+  answer:1,
+  explanation:"A threat actor (or threat agent) is the entity that carries out a threat — in this case, a nation-state group. The threats themselves are the actual actions or events (ransomware attacks, social engineering, exploitation). Distinguishing threat actors from threats is important in risk modelling to understand motivation, capability, and intent."
+},
+{
+  domain:2,
+  text:"An organisation's risk register has not been reviewed in 18 months. Which of the following is the GREATEST concern with this situation?",
+  options:["The register may not comply with ISO 27001 documentation requirements","New and emerging risks may not be reflected, leading to under-protection of key assets","The register format may be outdated compared to industry best practices","Staff may not be aware of the current version of the risk register"],
+  answer:1,
+  explanation:"The risk landscape evolves constantly. An 18-month-old risk register may not reflect new threats, changed business processes, new technologies, or shifts in the regulatory environment. This creates significant exposure to unidentified and unmanaged risks. Keeping the risk register current is essential for effective risk-based decision making."
+},
+{
+  domain:2,
+  text:"During a vendor selection process, a CISM is reviewing the risk posed by a third-party payroll processing company. The third party has provided a SOC 2 Type II report. What does this report confirm?",
+  options:["The vendor's controls were well-designed at a specific point in time","The vendor's controls were both designed appropriately and operated effectively over a defined period","The vendor has achieved ISO 27001 certification and passed an independent audit","The vendor has no material security weaknesses as of the report date"],
+  answer:1,
+  explanation:"A SOC 2 Type II report confirms that the vendor's controls were not only suitably designed (Type I) but also operated effectively over a specified period, typically 6-12 months. This provides significantly greater assurance than a Type I report, which only assesses design at a point in time. It does not equate to ISO 27001 certification."
+},
+{
+  domain:2,
+  text:"A CISM is advising on how to treat a risk where the cost of implementing controls is significantly higher than the expected loss from the risk materialising. Which recommendation is MOST appropriate?",
+  options:["Implement compensating controls to partially reduce the risk","Accept the risk formally, document it, and obtain sign-off from the appropriate business owner","Insure against the risk to transfer the financial impact","Avoid the risk entirely by discontinuing the associated business activity"],
+  answer:1,
+  explanation:"When control costs exceed expected losses, risk acceptance is the most rational and cost-effective response. However, acceptance must be formal — documented in the risk register with explicit sign-off from the appropriate business owner, not the security team. This ensures accountability and audit trail for the decision."
+},
+
+// ─── DOMAIN 3: INFORMATION SECURITY PROGRAM (17 questions) ───
+{
+  domain:3,
+  text:"A CISM is developing the organisation's information security programme. Which of the following should be the FIRST step?",
+  options:["Select a security framework such as ISO 27001 or NIST CSF","Conduct a current-state assessment to identify existing capabilities and gaps","Develop a comprehensive set of security policies and standards","Implement technical controls to address the highest-priority vulnerabilities"],
+  answer:1,
+  explanation:"Before building or improving a security programme, you must understand where you currently stand. A current-state assessment (often using gap analysis) establishes the baseline against which progress can be measured and gaps can be prioritised. Selecting frameworks or writing policies without this foundation leads to misdirected effort."
+},
+{
+  domain:3,
+  text:"An organisation classifies data into four tiers: Public, Internal, Confidential, and Restricted. A database containing medical records of employees is being assessed. Which classification is MOST appropriate, and who has authority to make this determination?",
+  options:["Confidential, determined by the IT security team","Restricted, determined by the information owner (HR or Legal)","Internal, determined by the database administrator","Restricted, determined by the Chief Information Security Officer"],
+  answer:1,
+  explanation:"Medical records typically contain highly sensitive personal data that warrants the highest classification — Restricted. Critically, the authority to classify data belongs to the information owner — the business unit responsible for the data (HR or Legal in this case), not IT or the CISO. The CISO provides guidance but does not own classification decisions."
+},
+{
+  domain:3,
+  scenario:"A retail organisation processes customer payment card data and is required to comply with PCI DSS. An external auditor has noted that the organisation relies on a third-party payment processor for all card transactions.",
+  text:"Which of the following statements is MOST accurate regarding the organisation's PCI DSS obligations?",
+  options:["Outsourcing card processing eliminates the organisation's PCI DSS obligations","The organisation remains responsible for ensuring the third party is PCI DSS compliant and for in-scope systems it controls","The organisation only needs to comply with requirements related to the cardholder data environment it operates","PCI DSS obligations pass entirely to the third-party processor once a contract is signed"],
+  answer:1,
+  explanation:"Outsourcing does not eliminate compliance obligations. The organisation must ensure its third-party processor is PCI DSS compliant (evidenced by the processor's Report on Compliance or Attestation of Compliance) and must also comply with PCI DSS requirements for any in-scope systems it directly controls. Accountability cannot be contracted away."
+},
+{
+  domain:3,
+  text:"Which of the following control types would BEST detect whether an insider threat has accessed sensitive files without authorisation?",
+  options:["Access control lists restricting file access to authorised users","Mandatory encryption of sensitive files at rest","File access audit logging and anomaly detection","Background checks during the employee onboarding process"],
+  answer:2,
+  explanation:"Audit logging and anomaly detection are detective controls — they identify and alert on unusual access patterns after or as they occur. Access control lists and encryption are preventive controls. Background checks are deterrent controls. When dealing with insider threats who may have legitimate access credentials, detective controls are critical for identifying misuse."
+},
+{
+  domain:3,
+  text:"A CISM is asked to recommend a control framework for an organisation that wants to align its security programme with both business objectives and IT governance. Which framework is MOST appropriate?",
+  options:["NIST SP 800-53 — for comprehensive technical control requirements","COBIT — for IT governance integrating business goals with security controls","ISO 27002 — for an internationally recognised set of security best practices","CIS Controls — for prioritised technical security actions"],
+  answer:1,
+  explanation:"COBIT (Control Objectives for Information and Related Technologies) is specifically designed to align IT governance with business objectives, making it the best fit for an organisation seeking to integrate security with broader IT governance and business goals. The other frameworks are excellent for security controls but are not governance frameworks in the same sense."
+},
+{
+  domain:3,
+  text:"The organisation's penetration test reveals that the web application is vulnerable to SQL injection. The development team estimates a six-week remediation timeline. What should the CISM do in the INTERIM?",
+  options:["Shut down the web application until it is fully remediated","Implement a Web Application Firewall (WAF) as a compensating control","Accept the risk and wait for the permanent fix","Notify all customers of the potential vulnerability immediately"],
+  answer:1,
+  explanation:"When permanent remediation will be delayed, compensating controls should be implemented to reduce the risk in the interim. A WAF can detect and block SQL injection attempts, significantly reducing exposure while the code fix is developed and tested. Shutting down the application would be disproportionate unless the risk is critical and unmitigable."
+},
+{
+  domain:3,
+  text:"An organisation is implementing a privileged access management (PAM) solution. Which of the following BEST describes the primary security objective of PAM?",
+  options:["To ensure all user accounts use multi-factor authentication across the enterprise","To control, monitor, and audit access by accounts with elevated system privileges","To prevent external attackers from obtaining administrative credentials","To manage password policies for all user accounts in the directory"],
+  answer:1,
+  explanation:"PAM specifically targets privileged accounts — those with administrative or elevated access rights that can make significant changes to systems. The goal is to control who has such access, under what conditions, and to maintain a full audit trail of privileged activity. This reduces both insider threat and the impact of credential compromise."
+},
+{
+  domain:3,
+  text:"A CISM wants to measure the effectiveness of the organisation's security awareness programme. Which of the following metrics would BEST indicate that the programme is achieving its goal of reducing human-related security risk?",
+  options:["Percentage of employees who completed the annual training module","Number of security policies employees have acknowledged","Reduction in phishing simulation click rates over time","Number of security awareness communications sent to staff"],
+  answer:2,
+  explanation:"Behavioural change is the true measure of awareness programme effectiveness. A reduction in phishing simulation click rates directly demonstrates that employees are better identifying and avoiding social engineering attacks — a measurable change in risk-related behaviour. Completion rates and acknowledgements measure participation, not effectiveness."
+},
+{
+  domain:3,
+  text:"When establishing a vulnerability management programme, which of the following factors should PRIMARILY drive remediation prioritisation?",
+  options:["CVSS score alone, as this provides an objective technical severity rating","Vendor patch release date, to ensure timely compliance with vendor guidance","Risk to the organisation based on asset criticality, exploitability, and business context","Ease of remediation, to demonstrate quick wins to management"],
+  answer:2,
+  explanation:"Effective vulnerability remediation prioritisation must consider business context. A critical CVSS score on an isolated internal test system poses far less risk than a medium score on an internet-facing payment system. Risk-based prioritisation — combining technical severity with asset criticality and exposure — produces the most effective use of remediation resources."
+},
+{
+  domain:3,
+  text:"A CISM is reviewing access rights for a finance department employee who recently moved from accounts payable to accounts receivable. Which access management principle requires their old access to be revoked?",
+  options:["Least privilege — limiting access to only what is necessary for the current role","Separation of duties — preventing conflicting access rights","Need to know — restricting access to information relevant to responsibilities","Mandatory access control — enforcing access based on classification labels"],
+  answer:0,
+  explanation:"The principle of least privilege requires that users have only the minimum access necessary for their current role. When a user moves roles (a 'mover' in the joiner-mover-leaver lifecycle), previous role access must be revoked. Retaining previous access leads to access creep, creating both security and audit/compliance risks."
+},
+{
+  domain:3,
+  text:"An organisation's legal team has issued a litigation hold notice relating to a potential lawsuit. What is the IMMEDIATE obligation for the information security team?",
+  options:["Encrypt all data related to the case to protect it from disclosure","Suspend routine data retention and deletion policies for in-scope data","Immediately produce all relevant data for external legal counsel","Conduct a forensic investigation to determine if data has been tampered with"],
+  answer:1,
+  explanation:"A legal hold (also called a litigation hold or preservation notice) requires the organisation to suspend normal data retention and deletion schedules for data that may be relevant to legal proceedings. Destroying data subject to a legal hold — even routinely — can constitute spoliation of evidence and expose the organisation to severe legal penalties."
+},
+{
+  domain:3,
+  text:"A CISM is performing a security programme review and finds that several security controls are overlapping and duplicating effort. What is the BEST approach?",
+  options:["Remove all redundant controls immediately to reduce cost","Evaluate each control's contribution to risk reduction before making changes, retaining defence in depth where appropriate","Consolidate all security tools into a single platform to eliminate duplication","Accept the duplication as a feature of a mature security programme"],
+  answer:1,
+  explanation:"Redundancy in controls (defence in depth) can be intentional and valuable, so overlapping controls should not automatically be removed. The correct approach is to evaluate whether each control provides meaningful risk reduction. Controls that are truly redundant with no additional risk reduction value can be removed; intentional layering should be retained."
+},
+{
+  domain:3,
+  text:"Which of the following BEST describes the purpose of a security architecture review when onboarding a new enterprise system?",
+  options:["To validate that the vendor has achieved ISO 27001 certification","To confirm the system meets defined security requirements and integrates safely with the existing environment","To perform a penetration test on the new system before deployment","To document the system in the asset inventory before production launch"],
+  answer:1,
+  explanation:"A security architecture review during system onboarding ensures the new system is assessed against the organisation's security requirements, that it integrates securely with existing infrastructure (network segmentation, authentication, data flows), and that risks are identified and addressed before the system goes live — not after."
+},
+{
+  domain:3,
+  text:"An organisation is implementing Zero Trust architecture. Which of the following principles is MOST central to this approach?",
+  options:["Perimeter-based security controls are sufficient if implemented correctly","All users, devices, and network traffic must be continuously verified regardless of location","Internal network traffic can be trusted as it originates inside the corporate perimeter","Security zones should be created to segment trusted from untrusted networks"],
+  answer:1,
+  explanation:"Zero Trust is built on the principle of 'never trust, always verify.' It assumes that threats exist both inside and outside the network perimeter, so no user, device, or traffic should be trusted by default — even internal traffic. Continuous verification, micro-segmentation, and least-privilege access are core principles."
+},
+{
+  domain:3,
+  scenario:"A healthcare organisation has implemented full-disk encryption on all laptops. An employee's laptop containing patient records is stolen from a vehicle. The employee reports the theft to IT security within two hours.",
+  text:"Which of the following is the MOST likely outcome from a regulatory perspective?",
+  options:["The organisation must notify all affected patients immediately as a breach has occurred","The theft constitutes a reportable breach regardless of the encryption status","The encryption may qualify as a safe harbour, potentially exempting the organisation from breach notification obligations","The organisation should conduct a forensic investigation before determining notification requirements"],
+  answer:2,
+  explanation:"Under regulations such as HIPAA and GDPR, encryption of data at rest can qualify as a safe harbour — meaning that if the data is rendered unreadable, unusable, or indecipherable to unauthorised individuals, it may exempt the organisation from breach notification obligations. This underscores encryption's value as both a protective and compliance control."
+},
+{
+  domain:3,
+  text:"A CISM is developing a business case to increase the security budget. Which of the following approaches is MOST likely to gain executive approval?",
+  options:["Present the number of critical vulnerabilities identified in the last assessment","Express security investment in terms of risk reduction, avoided costs, and business enablement","Compare the organisation's security spending against industry benchmarks","List all regulatory compliance requirements and the controls needed to satisfy them"],
+  answer:1,
+  explanation:"Executives make decisions based on business value. Framing security investment in terms of quantifiable risk reduction, avoided losses (ALE-based), and business enablement (supporting growth, protecting revenue) is far more persuasive than technical metrics. Connecting security spend to business outcomes is the language of effective executive communication."
+},
+{
+  domain:3,
+  text:"Which of the following BEST describes the difference between a security policy and a security standard?",
+  options:["Policies are mandatory; standards are optional guidelines","Policies state what must be done and why; standards define specific, measurable requirements for how to comply","Standards are approved by the board; policies are developed by the security team","Policies apply to technical systems; standards apply to user behaviour"],
+  answer:1,
+  explanation:"A security policy is a high-level statement of management intent — it describes what the organisation requires and the rationale, but not implementation specifics. A standard provides the specific, measurable requirements that implement the policy. Both are mandatory. Policies without supporting standards lack the specificity needed for consistent implementation."
+},
+
+// ─── DOMAIN 4: INCIDENT MANAGEMENT (14 questions) ───
+{
+  domain:4,
+  text:"A CISM is establishing an incident response capability for the first time. Which of the following should be completed FIRST?",
+  options:["Procure a Security Information and Event Management (SIEM) platform","Develop and document an Incident Response Plan (IRP)","Hire a dedicated incident response team","Conduct a tabletop exercise to test response capabilities"],
+  answer:1,
+  explanation:"Before responding to incidents, the organisation must have a documented plan. The IRP defines roles, responsibilities, escalation paths, communication procedures, and response steps. Without this foundation, incident response is ad hoc and inconsistent. Technology (SIEM) and testing (tabletop) come after the plan exists."
+},
+{
+  domain:4,
+  text:"During an active ransomware incident, the incident response team has confirmed that malware has encrypted files across multiple servers. What should be the IMMEDIATE next step?",
+  options:["Begin restoring from the most recent backups to minimise downtime","Wipe and rebuild all affected systems from known good images","Contain the incident by isolating affected systems from the network","Identify and eliminate the malware's persistence mechanisms and root cause"],
+  answer:2,
+  explanation:"In the NIST incident response lifecycle, Containment must precede Eradication and Recovery. The immediate priority during an active ransomware attack is to contain the spread by isolating infected systems. Attempting recovery or eradication before containment risks further encryption spread across additional systems and networks."
+},
+{
+  domain:4,
+  scenario:"A financial institution has experienced a data breach in which customer account numbers and personal data were exfiltrated. The breach was discovered on a Tuesday. The organisation is subject to GDPR.",
+  text:"By when must the organisation notify the relevant supervisory authority?",
+  options:["Within 24 hours of discovery","Within 72 hours of becoming aware of the breach","Within 30 days, following a full investigation","Notification is only required if the breach affects more than 1,000 individuals"],
+  answer:1,
+  explanation:"GDPR Article 33 requires that personal data breaches be reported to the competent supervisory authority within 72 hours of the organisation becoming aware of the breach. This is one of the most commonly tested regulatory timelines in the CISM exam. Notification to affected individuals may also be required under Article 34 in certain circumstances."
+},
+{
+  domain:4,
+  text:"During a post-incident review, the team identifies that the breach went undetected for six months due to insufficient logging. Which of the following BEST describes the type of finding this represents?",
+  options:["A gap in preventive controls that allowed the attacker initial access","A gap in detective controls that delayed identification of the breach","A failure in the corrective control framework during recovery","A deficiency in the deterrent control environment"],
+  answer:1,
+  explanation:"Logging and monitoring are detective controls — their purpose is to identify when security events occur. A six-month dwell time (time from initial compromise to detection) represents a failure of detective controls. This is a critical finding: the preventive controls may have partially failed (the attacker got in), but the detection failure compounded the damage significantly."
+},
+{
+  domain:4,
+  text:"An organisation's Business Impact Analysis (BIA) identifies that its order management system has an RTO of 4 hours and an RPO of 1 hour. What do these figures mean for the disaster recovery strategy?",
+  options:["The system must be restored within 4 hours, and backups must be taken at least every 4 hours","The system must be restored within 4 hours, and no more than 1 hour of data can be lost in a recovery scenario","The system can be offline for 1 hour before business impact, and data must be backed up every 4 hours","Recovery must begin within 1 hour and complete within 4 hours"],
+  answer:1,
+  explanation:"RTO (Recovery Time Objective) defines the maximum acceptable duration of downtime — restore the system within 4 hours. RPO (Recovery Point Objective) defines the maximum acceptable data loss — backups (or replication) must ensure no more than 1 hour of data is lost. Together, these drive decisions on backup frequency, replication technology, and recovery site capability."
+},
+{
+  domain:4,
+  text:"Which type of disaster recovery test is MOST thorough but carries the HIGHEST risk of disruption to production operations?",
+  options:["Tabletop exercise — a discussion-based walkthrough of response procedures","Parallel test — running the DR site alongside production simultaneously","Full interruption test — failing over entirely to the DR site, taking production offline","Simulation exercise — testing specific scenarios without operational failover"],
+  answer:2,
+  explanation:"A full interruption test involves actually switching production operations to the disaster recovery site, taking the primary site offline. This provides the most realistic and complete test of DR capabilities but carries the highest risk of service disruption. It should only be conducted when other test types have already validated the DR plan."
+},
+{
+  domain:4,
+  text:"A CISM is selecting a recovery site strategy for a system with a 2-hour RTO. Which option is MOST appropriate?",
+  options:["Cold site — lowest cost, physical facility only, weeks to activate","Warm site — partially equipped, hours to days to activate","Hot site — fully operational with real-time data replication, immediate failover","Mobile recovery unit — deployed to any location as needed"],
+  answer:2,
+  explanation:"A 2-hour RTO requires near-immediate failover capability. A hot site, which maintains fully operational infrastructure with real-time or near-real-time data replication, is the only option that can consistently meet a 2-hour RTO. Cold sites require weeks and warm sites typically require hours to days — both would fail to meet this requirement."
+},
+{
+  domain:4,
+  text:"During a security incident investigation, the forensic investigator creates a bit-for-bit image of the suspect hard drive before performing analysis. Which principle does this practice uphold?",
+  options:["Non-repudiation — ensuring the suspect cannot deny their actions","Chain of custody — maintaining documented control over evidence","Integrity preservation — analysing a copy to protect the original evidence","Order of volatility — prioritising the most volatile evidence first"],
+  answer:2,
+  explanation:"Creating a forensic image (bit-for-bit copy) before analysis protects the integrity of the original evidence by ensuring all analysis is performed on the copy, not the original. This prevents inadvertent modification of evidence. Chain of custody refers to documentation of who handled evidence; order of volatility relates to evidence collection sequence."
+},
+{
+  domain:4,
+  scenario:"A CISM receives a report that an employee's credentials have been used to access the HR system at 2am from an overseas IP address. The employee is currently on holiday in a country where this IP address is not located.",
+  text:"What is the FIRST action the CISM should take?",
+  options:["Contact the employee immediately to verify if they authorised the access","Disable the employee's account and preserve relevant log data as evidence","Conduct a full forensic investigation of the HR system","Notify senior management and the legal team of the potential incident"],
+  answer:1,
+  explanation:"When there is strong evidence of unauthorised account use, the immediate priority is containment — disabling the compromised account to prevent further access — while simultaneously preserving evidence (logs) for investigation. Contacting the employee first would delay containment. Management notification may follow once the account is secured."
+},
+{
+  domain:4,
+  text:"Which of the following BEST describes the purpose of a post-incident review (PIR)?",
+  options:["To assign blame and hold responsible individuals accountable for the incident","To identify lessons learned and improve processes, plans, and controls to prevent recurrence","To satisfy regulatory requirements for incident documentation and reporting","To determine the financial impact of the incident for insurance claim purposes"],
+  answer:1,
+  explanation:"The post-incident review (also called lessons learned) is a blameless, improvement-focused activity. Its purpose is to identify what happened, what worked, what didn't, and what changes should be made to processes, controls, and plans to reduce the likelihood or impact of future incidents. A punitive focus undermines honest reporting and learning."
+},
+{
+  domain:4,
+  text:"An organisation's IRP states that incidents must be classified by severity within 30 minutes of detection. Which of the following is the PRIMARY benefit of this requirement?",
+  options:["It ensures regulatory notification deadlines are met for all incidents","It enables appropriate resource allocation and response urgency based on business impact","It satisfies audit requirements for incident documentation","It prevents over-escalation of minor incidents to senior management"],
+  answer:1,
+  explanation:"Rapid severity classification ensures that response resources — staffing, escalation, management involvement, and communication — are proportionate to the actual business impact. A critical incident requires a different response than a low-severity event. Without timely classification, organisations risk under-responding to serious incidents or over-investing in minor ones."
+},
+{
+  domain:4,
+  text:"Which of the following BEST describes the relationship between the Business Continuity Plan (BCP) and the Disaster Recovery Plan (DRP)?",
+  options:["The BCP and DRP are alternative approaches to the same problem — only one is needed","The DRP is a subset of the BCP, focusing specifically on IT system recovery as part of broader business continuity","The BCP focuses on IT recovery; the DRP addresses business process continuity","The BCP is activated only for natural disasters; the DRP covers all other types of incidents"],
+  answer:1,
+  explanation:"The BCP is the overarching plan for maintaining or rapidly resuming business operations following a disruption — it covers all business functions. The DRP is a component of the BCP that specifically addresses the recovery of IT systems and infrastructure. Business continuity is the goal; disaster recovery is one of the means to achieve it."
+},
+{
+  domain:4,
+  text:"An organisation has implemented a Security Operations Centre (SOC) that receives thousands of alerts daily. The SOC team is struggling to identify genuine threats among the noise. Which of the following would BEST address this problem?",
+  options:["Increase the number of analysts in the SOC to handle higher alert volumes","Implement alert tuning and threat intelligence integration to reduce false positives","Remove detection rules that generate the highest volume of low-quality alerts","Outsource tier-1 alert triage to a managed security service provider"],
+  answer:1,
+  explanation:"Alert fatigue — where analysts become desensitised due to high volumes of low-quality alerts — is best addressed by improving alert quality. Tuning detection rules to reduce false positives and integrating threat intelligence to contextualise and prioritise alerts improves signal-to-noise ratio. Simply adding analysts or removing rules does not solve the underlying quality problem."
+},
+{
+  domain:4,
+  text:"A CISM is establishing communication procedures for major security incidents. Which of the following groups should be included in the incident communication plan?",
+  options:["Only internal technical teams directly involved in remediation","Senior management, legal, PR/communications, and potentially regulators and customers depending on incident type","The board of directors exclusively, as they hold ultimate accountability","Only affected business units and the security team to limit information exposure"],
+  answer:1,
+  explanation:"Effective incident communication requires a structured, pre-defined approach covering multiple stakeholder groups. Senior management need situational awareness; legal advises on liability and obligations; PR manages external messaging; regulators may require notification; affected customers may need to be informed. A comprehensive communication plan addresses all relevant parties in advance."
+}
+];
+
+// ─── STATE ───
+let currentQ = 0;
+let answers = new Array(questions.length).fill(null);
+let flagged = new Array(questions.length).fill(false);
+let timerInterval = null;
+let totalSeconds = 80 * 60; // 80 min for 50q (proportional to 240min for 150q)
+let examStarted = false;
+let examSubmitted = false;
+
+// ─── TIMER ───
+function startTimer() {
+  timerInterval = setInterval(() => {
+    totalSeconds--;
+    updateTimerDisplay();
+    if (totalSeconds <= 0) { clearInterval(timerInterval); submitExam(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  const display = h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  document.getElementById('timerText').textContent = display;
+  const el = document.getElementById('timerDisplay');
+  el.classList.remove('warn','critical');
+  if (totalSeconds < 600) el.classList.add('critical');
+  else if (totalSeconds < 1200) el.classList.add('warn');
+}
+
+// ─── INIT ───
+function startExam() {
+  document.getElementById('startScreen').classList.remove('active');
+  document.getElementById('examWrapper').classList.add('active');
+  examStarted = true;
+  buildGrid();
+  renderQuestion();
+  startTimer();
+}
+
+function buildGrid() {
+  const grid = document.getElementById('qGrid');
+  grid.innerHTML = '';
+  questions.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'q-dot';
+    dot.textContent = i + 1;
+    dot.id = `dot-${i}`;
+    dot.onclick = () => { currentQ = i; renderQuestion(); };
+    grid.appendChild(dot);
+  });
+}
+
+function updateGrid() {
+  questions.forEach((_, i) => {
+    const dot = document.getElementById(`dot-${i}`);
+    dot.className = 'q-dot';
+    if (i === currentQ) dot.classList.add('current');
+    if (flagged[i]) dot.classList.add('flagged-dot');
+    if (answers[i] !== null) dot.classList.add('answered');
+  });
+}
+
+function updateStats() {
+  const answeredCount = answers.filter(a => a !== null).length;
+  const flaggedCount = flagged.filter(Boolean).length;
+  document.getElementById('statAnswered').textContent = `${answeredCount} / ${questions.length}`;
+  document.getElementById('statFlagged').textContent = flaggedCount;
+  document.getElementById('statUnanswered').textContent = questions.length - answeredCount;
+  const correct = answers.reduce((acc, a, i) => a !== null ? (a === questions[i].answer ? acc+1 : acc) : acc, 0);
+  document.getElementById('statCorrect').textContent = answeredCount > 0 ? `${correct} / ${answeredCount}` : '—';
+  document.getElementById('headerProgress').textContent = `Question ${currentQ+1} of ${questions.length}`;
+  document.getElementById('answeredCount').textContent = `${answeredCount} answered`;
+  document.getElementById('progressFill').style.width = `${((currentQ+1)/questions.length)*100}%`;
+  document.getElementById('qNumber').textContent = `Question ${currentQ+1} of ${questions.length}`;
+}
+
+// ─── RENDER QUESTION ───
+function renderQuestion() {
+  const q = questions[currentQ];
+  updateStats();
+  updateGrid();
+
+  // Domain badge
+  const domainNames = ['','Information Security Governance','Information Risk Management','Information Security Program','Incident Management'];
+  const domainEl = document.getElementById('qDomain');
+  domainEl.textContent = `Domain ${q.domain} · ${domainNames[q.domain]}`;
+  domainEl.className = `q-domain domain-${q.domain}`;
+
+  // Scenario
+  const sb = document.getElementById('scenarioBox');
+  if (q.scenario) {
+    sb.style.display = 'block';
+    document.getElementById('scenarioText').textContent = q.scenario;
+  } else {
+    sb.style.display = 'none';
+  }
+
+  document.getElementById('questionText').textContent = q.text;
+
+  // Options
+  const letters = ['A','B','C','D'];
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.id = `opt-${i}`;
+
+    const isAnswered = answers[currentQ] !== null;
+    if (isAnswered) {
+      div.classList.add('answered');
+      if (i === q.answer) div.classList.add(answers[currentQ] === i ? 'correct' : 'reveal-correct');
+      if (i === answers[currentQ] && answers[currentQ] !== q.answer) div.classList.add('wrong');
+      div.style.cursor = 'default';
+    } else if (i === answers[currentQ]) {
+      div.classList.add('selected');
+    }
+
+    div.innerHTML = `<div class="option-letter">${letters[i]}</div><div class="option-text">${opt}</div>`;
+    if (!isAnswered) div.onclick = () => selectOption(i);
+    container.appendChild(div);
+  });
+
+  // Explanation
+  const expEl = document.getElementById('explanation');
+  expEl.className = 'explanation';
+  if (answers[currentQ] !== null) {
+    const isCorrect = answers[currentQ] === q.answer;
+    if (!isCorrect) expEl.classList.add('wrong-exp');
+    document.getElementById('expLabel').textContent = isCorrect ? `✓ Correct — ${letters[q.answer]}` : `✗ Incorrect — Correct answer: ${letters[q.answer]}`;
+    document.getElementById('expText').textContent = q.explanation;
+    expEl.classList.add('show');
+  }
+
+  // Flag button
+  const flagBtn = document.getElementById('flagBtn');
+  flagBtn.className = `flag-btn ${flagged[currentQ] ? 'flagged' : ''}`;
+  flagBtn.textContent = flagged[currentQ] ? '⚑ Flagged for Review' : '⚑ Flag for Review';
+
+  // Nav buttons
+  document.getElementById('prevBtn').disabled = currentQ === 0;
+  const isLast = currentQ === questions.length - 1;
+  document.getElementById('nextBtn').style.display = isLast ? 'none' : 'inline-block';
+  document.getElementById('submitBtn').style.display = isLast ? 'inline-block' : 'none';
+}
+
+function selectOption(i) {
+  if (answers[currentQ] !== null) return;
+  answers[currentQ] = i;
+  renderQuestion();
+}
+
+function toggleFlag() {
+  flagged[currentQ] = !flagged[currentQ];
+  renderQuestion();
+}
+
+function navigate(dir) {
+  const next = currentQ + dir;
+  if (next >= 0 && next < questions.length) { currentQ = next; renderQuestion(); }
+}
+
+// ─── SUBMIT ───
+function submitExam() {
+  if (examSubmitted) return;
+  const unanswered = answers.filter(a => a === null).length;
+  if (unanswered > 0 && !confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+  examSubmitted = true;
+  clearInterval(timerInterval);
+  showResults();
+}
+
+// ─── RESULTS ───
+function showResults() {
+  document.getElementById('examWrapper').classList.remove('active');
+  document.getElementById('resultsScreen').classList.add('active');
+
+  const total = questions.length;
+  const correct = answers.reduce((acc, a, i) => a === questions[i].answer ? acc+1 : acc, 0);
+  const pct = Math.round((correct / total) * 100);
+
+  // CISM scaled score is 200-800, pass = 450. Approx: (correct/total)*600+200
+  const scaledScore = Math.round((correct/total)*600+200);
+  const passed = scaledScore >= 450;
+
+  document.getElementById('scorePct').textContent = `${pct}%`;
+  document.getElementById('scoreDetail').textContent = `${correct} of ${total} correct · Scaled score ≈ ${scaledScore} / 800`;
+
+  const circle = document.getElementById('scoreCircle');
+  circle.style.borderColor = passed ? '#166534' : '#991b1b';
+  circle.style.color = passed ? '#166534' : '#991b1b';
+
+  const pfBadge = document.getElementById('passFailBadge');
+  pfBadge.textContent = passed ? '✓ PASS — Above the 450 Passing Threshold' : '✗ REFER — Below the 450 Passing Threshold';
+  pfBadge.style.color = passed ? '#166534' : '#991b1b';
+
+  // Domain breakdown
+  const domains = [1,2,3,4];
+  const domainNames = {1:'Governance',2:'Risk Management',3:'Security Program',4:'Incident Management'};
+  const domainColors = {1:'#3b82f6',2:'#8b5cf6',3:'#10b981',4:'#f59e0b'};
+  const domainStats = {};
+  domains.forEach(d => { domainStats[d] = { correct:0, total:0 }; });
+  questions.forEach((q, i) => {
+    domainStats[q.domain].total++;
+    if (answers[i] === q.answer) domainStats[q.domain].correct++;
+  });
+
+  const domainResultsEl = document.getElementById('domainResults');
+  domainResultsEl.innerHTML = domains.map(d => {
+    const s = domainStats[d];
+    const dp = s.total > 0 ? Math.round((s.correct/s.total)*100) : 0;
+    return `<div class="domain-result-bar">
+      <div class="drb-header"><span>Domain ${d} · ${domainNames[d]}</span><span>${s.correct}/${s.total} (${dp}%)</span></div>
+      <div class="drb-bar"><div class="drb-fill" style="width:${dp}%;background:${domainColors[d]}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Summary stats
+  const timeUsed = (80*60 - totalSeconds);
+  const mins = Math.floor(timeUsed/60);
+  const secs = timeUsed%60;
+  document.getElementById('summaryStats').innerHTML = `
+    <div class="stat-row"><span class="stat-label">Correct</span><span class="stat-val">${correct} / ${total}</span></div>
+    <div class="stat-row"><span class="stat-label">Incorrect</span><span class="stat-val">${total - correct - answers.filter(a=>a===null).length}</span></div>
+    <div class="stat-row"><span class="stat-label">Unanswered</span><span class="stat-val">${answers.filter(a=>a===null).length}</span></div>
+    <div class="stat-row"><span class="stat-label">Flagged</span><span class="stat-val">${flagged.filter(Boolean).length}</span></div>
+    <div class="stat-row"><span class="stat-label">Time Used</span><span class="stat-val">${mins}m ${secs}s</span></div>
+    <div class="stat-row"><span class="stat-label">Scaled Score</span><span class="stat-val">${scaledScore}/800</span></div>
+  `;
+
+  // Question review
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = questions.map((q, i) => {
+    const a = answers[i];
+    const isCorrect = a === q.answer;
+    const letters = ['A','B','C','D'];
+    const yourAnswer = a !== null ? `Your answer: ${letters[a]}` : 'Not answered';
+    return `<div class="review-item">
+      <div class="review-item-header">
+        <span style="font-size:0.7rem;color:var(--muted);font-family:'IBM Plex Mono',monospace">Q${i+1} · Domain ${q.domain}</span>
+        <span class="review-badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">${isCorrect ? '✓ Correct' : '✗ Incorrect'}</span>
+      </div>
+      <div class="review-item-q">${q.text.substring(0,120)}${q.text.length>120?'…':''}</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:0.4rem">${yourAnswer} · Correct: ${letters[q.answer]}</div>
+    </div>`;
+  }).join('');
+}
+
+function restartExam() {
+  currentQ = 0;
+  answers = new Array(questions.length).fill(null);
+  flagged = new Array(questions.length).fill(false);
+  totalSeconds = 80 * 60;
+  examSubmitted = false;
+
+  document.getElementById('resultsScreen').classList.remove('active');
+  document.getElementById('startScreen').classList.add('active');
+  document.getElementById('examWrapper').classList.remove('active');
+  clearInterval(timerInterval);
+}
+</script>
+</body>
+</html>
